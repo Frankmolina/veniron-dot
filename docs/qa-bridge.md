@@ -59,8 +59,25 @@ no config parser change and no UI change in this step.
 - Where should drafts live: the assistant data directory or the QA assistant's?
 - May `qa_scan` touch the network, or only read a previously stored snapshot?
 
+## Phase 2 — read-only JSON adapter
+
+`packages/daemon/src/qa-bridge-readonly.ts` implements the contract's backend
+against one local JSON snapshot chosen by the caller:
+
+- `qa_scan` returns the snapshot's cycle, bugs and generation time.
+- `qa_disponibles` returns its `available` candidates.
+- `qa_duplicados` ranks local title similarity with a deterministic Jaccard
+  score; it never decides that something is a duplicate.
+- `qa_pasos` returns the stored steps, actual and expected result for one bug.
+
+It reads only that file. It does not open SQLite, CDP, Test IO/uTest, the QA
+plugin, profiles or the network, and it never writes. The module is still not
+imported by the daemon and the bridge remains off by default. The sample is
+`packages/daemon/test/fixtures/qa-bridge-sample.json`; tests use a temporary
+malformed file to prove errors are not returned as data.
+
 ## Next phases (only after approval)
 
-1. A real read-only backend adapter against the QA assistant.
+1. Review this adapter and decide the real read-only source.
 2. Local drafts with the existing approval dialog; no submission.
 3. Browser/reservation actions one at a time, each with its own scope and tests.
