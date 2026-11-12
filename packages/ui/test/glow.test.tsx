@@ -344,7 +344,7 @@ describe("GlowSurface (S28)", () => {
 		const css = stylesheet();
 		expect(rule(css, ".glow-working")).toMatch(/pointer-events: none/);
 		expect(rule(css, ".glow-working")).toMatch(/top: 0/);
-		expect(rule(css, ".glow-working")).toMatch(/#fbf6ee/);
+		expect(rule(css, ".glow-working")).toMatch(/#00b4ff/);
 		expect(rule(css, ".glow-working-light")).toMatch(/animation: glow-travel/);
 		expect(css).toMatch(/@keyframes glow-travel \{/);
 		expect(css).not.toMatch(/\.glow-ring/);
