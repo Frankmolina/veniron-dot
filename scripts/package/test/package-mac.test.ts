@@ -7,6 +7,7 @@ import {
 	keepsOwnSignature,
 	modeDifferences,
 	parseMacArgs,
+	resolveMacIdentity,
 	tauriReleaseConfig,
 } from "../lib.mjs";
 
@@ -44,6 +45,52 @@ describe("parseMacArgs", () => {
 		expect(() => parseMacArgs(["--sign"], {})).toThrow(/Unexpected argument --sign/);
 		expect(() => parseMacArgs(["--sign", "--check"], {})).toThrow(/Unexpected argument --sign/);
 		expect(() => parseMacArgs(["--sign", ""], {})).toThrow(/Unexpected argument --sign/);
+	});
+});
+
+describe("resolveMacIdentity", () => {
+	it("prefers VENIRON Dev on macOS when it exists, without touching another platform", () => {
+		expect(
+			resolveMacIdentity(AD_HOC, {
+				platform: "darwin",
+				env: {},
+				listIdentities: () => '1) ABC "VENIRON Dev" (CSSMERR_TP_NOT_TRUSTED)\n',
+			}),
+		).toBe("VENIRON Dev");
+		expect(
+			resolveMacIdentity(AD_HOC, {
+				platform: "linux",
+				env: {},
+				listIdentities: () => '1) ABC "VENIRON Dev"\n',
+			}),
+		).toBe(AD_HOC);
+		expect(
+			resolveMacIdentity(AD_HOC, {
+				platform: "darwin",
+				env: {},
+				listIdentities: () => "0 valid identities found\n",
+			}),
+		).toBe(AD_HOC);
+	});
+
+	it("keeps an explicit identity or environment override", () => {
+		expect(resolveMacIdentity("Other", { platform: "darwin", env: {} })).toBe("Other");
+		expect(
+			resolveMacIdentity(AD_HOC, {
+				platform: "darwin",
+				env: { GENTLE_DOT_SIGN_IDENTITY: "" },
+				listIdentities: () => '1) ABC "VENIRON Dev"\n',
+			}),
+		).toBe(AD_HOC);
+		expect(
+			resolveMacIdentity(AD_HOC, {
+				platform: "darwin",
+				env: {},
+				listIdentities: () => {
+					throw new Error("security missing");
+				},
+			}),
+		).toBe(AD_HOC);
 	});
 });
 

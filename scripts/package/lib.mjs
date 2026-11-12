@@ -387,6 +387,30 @@ export function parseMacArgs(argv, env = process.env) {
 }
 
 /**
+ * The local fallback identity: a stable `VENIRON Dev` certificate keeps TCC and
+ * Keychain grants across rebuilds. CI and machines without it stay ad hoc, and
+ * an explicit `--sign`/`GENTLE_DOT_SIGN_IDENTITY` always wins.
+ */
+export function resolveMacIdentity(
+	identity,
+	{
+		env = process.env,
+		platform = process.platform,
+		listIdentities = () =>
+			execFileSync("security", ["find-identity", "-p", "codesigning"], { encoding: "utf8" }),
+	} = {},
+) {
+	if (identity !== AD_HOC) return identity;
+	if (env.GENTLE_DOT_SIGN_IDENTITY !== undefined) return identity;
+	if (platform !== "darwin") return identity;
+	try {
+		return listIdentities().includes('"VENIRON Dev"') ? "VENIRON Dev" : identity;
+	} catch {
+		return identity;
+	}
+}
+
+/**
  * Whether a file's first bytes are a Mach-O header: thin 32/64-bit, or universal.
  * A universal header shares Java's class-file magic; it counts its architectures,
  * a small number, where a class file has its version, 45 or more.

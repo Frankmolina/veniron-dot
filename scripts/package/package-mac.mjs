@@ -33,6 +33,7 @@ import {
 	keepsOwnSignature,
 	modeDifferences,
 	parseMacArgs,
+	resolveMacIdentity,
 	sha256File,
 	tauriReleaseConfig,
 } from "./lib.mjs";
@@ -177,6 +178,9 @@ function checkDmg(dmg) {
 
 async function main() {
 	const options = parseMacArgs(process.argv.slice(2));
+	// An explicit --sign wins; otherwise prefer the stable local certificate when
+	// it exists, falling back to ad hoc on CI or a machine without it.
+	if (!process.argv.includes("--sign")) options.identity = resolveMacIdentity(options.identity);
 	assertHostTarget(TARGET);
 	if (options.checkDmg) {
 		checkDmg(resolve(process.env.INIT_CWD ?? process.cwd(), options.checkDmg));
