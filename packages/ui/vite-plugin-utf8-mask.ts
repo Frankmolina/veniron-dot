@@ -22,8 +22,8 @@ export function venironUtf8Mask(): Plugin {
 		name: "veniron-utf8-mask",
 		enforce: "pre",
 		load(id) {
-			const file = id.replaceAll("\\", "/").split("?")[0];
-			if (!file.endsWith(MASK_SUFFIX)) return null;
+			const [file] = id.replaceAll("\\", "/").split("?");
+			if (!file?.endsWith(MASK_SUFFIX)) return null;
 			const text = decodeMaskSvg(readFileSync(file));
 			const url = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(text)}`;
 			return `export default ${JSON.stringify(url)};`;

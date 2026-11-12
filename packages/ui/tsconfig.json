@@ -16,5 +16,5 @@
 			"path": "../protocol"
 		}
 	],
-	"include": ["src", "test", "vite.config.ts"]
+	"include": ["src", "test", "vite.config.ts", "vite-plugin-utf8-mask.ts"]
 }
