@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import type { QaBridgeSection } from "./qa-bridge-config.ts";
 import { runtimeDir, runtimeModules } from "./runtime.ts";
 
 export interface DotConfig {
@@ -21,6 +22,8 @@ export interface DotConfig {
 	/** The assistant's own Gentle Shell home; undefined for a custom agent script. */
 	agentHome: string | undefined;
 	allowedOrigins: string[];
+	/** Read-only QA bridge; off unless its own `activa` is exactly true. */
+	qaBridge: QaBridgeSection;
 }
 
 const DEFAULT_UI_DIR = fileURLToPath(new URL("../../ui/dist/app", import.meta.url));
@@ -172,6 +175,44 @@ function agentConfig(env: NodeJS.ProcessEnv, dataDir: string) {
 	return { agentCommand: process.execPath, agentArgs: [bundledGentleShell(env)], agentHome };
 }
 
+const QA_BRIDGE_STALE_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Reads the optional `qaBridge` object from `config.json`. A missing object is
+ * the safe default: off, passive and no snapshot path. A malformed value is
+ * refused instead of being guessed at; no file is read here.
+ */
+function parseQaBridge(value: unknown): QaBridgeSection {
+	if (value === undefined) {
+		return { activa: false, modo: "passive", snapshotPath: "", staleAfterMs: QA_BRIDGE_STALE_MS };
+	}
+	if (typeof value !== "object" || value === null || Array.isArray(value)) {
+		throw new Error("Invalid qaBridge in config.json: expected an object.");
+	}
+	const fields = value as Record<string, unknown>;
+	if (fields.activa !== undefined && typeof fields.activa !== "boolean") {
+		throw new Error("Invalid qaBridge.activa in config.json: expected true or false.");
+	}
+	if (fields.modo !== undefined && typeof fields.modo !== "string") {
+		throw new Error("Invalid qaBridge.modo in config.json: expected a string.");
+	}
+	if (fields.snapshotPath !== undefined && typeof fields.snapshotPath !== "string") {
+		throw new Error("Invalid qaBridge.snapshotPath in config.json: expected a string.");
+	}
+	if (fields.staleAfterMs !== undefined) {
+		const stale = Number(fields.staleAfterMs);
+		if (!Number.isFinite(stale) || stale <= 0) {
+			throw new Error("Invalid qaBridge.staleAfterMs in config.json: expected a positive number.");
+		}
+	}
+	return {
+		activa: fields.activa === true,
+		modo: typeof fields.modo === "string" && fields.modo ? fields.modo : "passive",
+		snapshotPath: typeof fields.snapshotPath === "string" ? fields.snapshotPath.trim() : "",
+		staleAfterMs: fields.staleAfterMs === undefined ? QA_BRIDGE_STALE_MS : Number(fields.staleAfterMs),
+	};
+}
+
 /** Resolves configuration from environment variables, then `~/.gentle-dot/config.json`, then defaults. */
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): DotConfig {
 	const dataDir = resolve(expandHome(env.GENTLE_DOT_DATA_DIR ?? "~/.gentle-dot"));
@@ -194,5 +235,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): DotConfig {
 		uiDir: resolve(env.GENTLE_DOT_UI_DIR ?? uiDirOf(env)),
 		...agentConfig(env, dataDir),
 		allowedOrigins: parseList(env.GENTLE_DOT_ALLOWED_ORIGINS, "GENTLE_DOT_ALLOWED_ORIGINS"),
+		qaBridge: parseQaBridge(file.qaBridge),
 	};
 }

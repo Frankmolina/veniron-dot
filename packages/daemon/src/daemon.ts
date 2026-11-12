@@ -40,6 +40,8 @@ import {
 import { MCP_PREFIX, McpProxy, type ProxiedConnector, type UpstreamCredentials } from "./mcp-proxy.ts";
 import { writePrivateFile } from "./private-file.ts";
 import { defaultImportPath, ProfileStore } from "./profiles.ts";
+import type { QaBridge } from "./qa-bridge.ts";
+import { createQaBridgeFromConfig, type QaBridgeSection } from "./qa-bridge-config.ts";
 import { type RotationLimits, rotationLimits } from "./rotation.ts";
 import { FileSecretSource, SECRETS_FILE, SECRETS_KEY_VAR } from "./secret-file.ts";
 import { AppSecretSource } from "./secret-source.ts";
@@ -94,6 +96,8 @@ export interface DaemonOptions {
 	vps?: VpsOptions;
 	/** Origins allowed to open the WebSocket, besides the daemon's own and the desktop app's. */
 	allowedOrigins?: string[];
+	/** Read-only QA bridge config; absent means off and no snapshot path. */
+	qaBridge?: QaBridgeSection;
 	backoffMs?: number[];
 	/** Several conversations instead of one continuous chat; default `GENTLE_DOT_CONVERSATIONS=1`. */
 	conversations?: boolean;
@@ -111,6 +115,8 @@ export interface DotDaemon {
 	token: string;
 	url: string;
 	bridge: DotBridge;
+	/** Off-by-default read-only QA bridge; created here but no tools are registered. */
+	qaBridge: QaBridge;
 	supervisor: AgentSupervisor;
 	/** Stops the daemon; calling it again returns the same stop. */
 	close(): Promise<void>;
@@ -196,6 +202,7 @@ async function startClaimedDaemon(
 	log: (line: string) => void,
 	claims: string[],
 ): Promise<DotDaemon> {
+	const qaBridge = createQaBridgeFromConfig({ qaBridge: options.qaBridge });
 	const openApp = () =>
 		options.appChannel
 			? new AppChannel(options.appChannel, {
@@ -544,6 +551,7 @@ async function startClaimedDaemon(
 		token,
 		url: `http://${options.host === "0.0.0.0" ? "127.0.0.1" : options.host}:${port}/#token=${token}`,
 		bridge,
+		qaBridge,
 		supervisor,
 		close,
 		closed,

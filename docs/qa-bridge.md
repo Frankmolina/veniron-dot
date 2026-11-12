@@ -20,8 +20,8 @@ smallest read-only seam that can be reviewed before any of that is exposed.
   tool, missing backend and invalid-result cases.
 - `docs/qa-bridge.md`: this document.
 
-The module is **not imported by the daemon**. There is no tool registration,
-no config parser change and no UI change in this step.
+The contract is **not registered as tools**. There is no tool registration and
+no UI change in this phase.
 
 ## Deliberately out of scope
 
@@ -71,8 +71,8 @@ against one local JSON snapshot chosen by the caller:
 - `qa_pasos` returns the stored steps, actual and expected result for one bug.
 
 It reads only that file. It does not open SQLite, CDP, Test IO/uTest, the QA
-plugin, profiles or the network, and it never writes. The module is still not
-imported by the daemon and the bridge remains off by default. The sample is
+plugin, profiles or the network, and it never writes. It is still not
+registered as a tool and the bridge remains off by default. The sample is
 `packages/daemon/test/fixtures/qa-bridge-sample.json`; tests use a temporary
 malformed file to prove errors are not returned as data.
 
@@ -97,7 +97,8 @@ The validated app configuration is:
 - `qa_estado` reports `snapshot.path`, `snapshot.generatedAt`,
   `snapshot.bugs` and `snapshot.stale` without returning the snapshot content.
 - `packages/daemon/src/qa-bridge-config.ts` builds the bridge from this config.
-  It is not imported by the daemon and registers no tools.
+  The daemon creates it at startup and exposes it as `DotDaemon.qaBridge`, but
+  registers no tools and never calls it on its own.
 - No copy of the JSON is written, and no profile, credential, plugin, CDP or
   SQLite access is added.
 
