@@ -24,6 +24,7 @@ import {
 	type ConnectorOAuthOptions,
 	ConnectorStore,
 	policyEnv,
+	QA_BRIDGE_TOOLS,
 } from "./connectors.ts";
 import { claimDaemonDirs, daemonClaimDirs, daemonClaimMessage, releaseDaemonClaims } from "./daemon-claim.ts";
 import { DiscordPackage } from "./discord-package.ts";
@@ -41,7 +42,7 @@ import { MCP_PREFIX, McpProxy, type ProxiedConnector, type UpstreamCredentials }
 import { writePrivateFile } from "./private-file.ts";
 import { defaultImportPath, ProfileStore } from "./profiles.ts";
 import type { QaBridge } from "./qa-bridge.ts";
-import { createQaBridgeFromConfig, type QaBridgeSection } from "./qa-bridge-config.ts";
+import { createQaBridgeFromConfig, QA_BRIDGE_CONFIG_ENV, type QaBridgeSection } from "./qa-bridge-config.ts";
 import { type RotationLimits, rotationLimits } from "./rotation.ts";
 import { FileSecretSource, SECRETS_FILE, SECRETS_KEY_VAR } from "./secret-file.ts";
 import { AppSecretSource } from "./secret-source.ts";
@@ -302,8 +303,11 @@ async function startClaimedDaemon(
 		log,
 	});
 	connectorStore.onUpdated = () => proxy.sync();
-	// The assistant's own engine loads the approval guard for connector actions.
-	const guardArgs = options.agentHome ? ["-e", APPROVAL_GUARD] : [];
+	// The QA bridge extension self-disables unless this exact config says activa:true.
+	if (options.qaBridge) agentEnv[QA_BRIDGE_CONFIG_ENV] = JSON.stringify(options.qaBridge);
+	// The assistant's own engine loads the approval guard for connector actions and the
+	// read-only QA tools; the latter registers nothing while the switch is off.
+	const guardArgs = options.agentHome ? ["-e", APPROVAL_GUARD, "-e", QA_BRIDGE_TOOLS] : [];
 	const supervisor = new AgentSupervisor({
 		command: options.agentCommand,
 		args: [...(options.agentArgs ?? []), ...homeArgs],

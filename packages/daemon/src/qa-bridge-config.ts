@@ -1,15 +1,17 @@
 /**
  * Phase 3 factory: build the read-only QA bridge from the app config.
  *
- * The daemon imports it at startup, but it registers no tools and never calls
- * the bridge on its own. The switch defaults to off. It reads the snapshot in
- * place; it never copies it, calls the QA plugin, opens SQLite/CDP or touches
- * profiles.
+ * The daemon imports it at startup; the engine extension registers the five
+ * tools only when the switch is exactly true. The daemon never calls the bridge
+ * on its own. It reads the snapshot in place; it never copies it, calls the QA
+ * plugin, opens SQLite/CDP or touches profiles.
  */
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { createQaBridge, type QaBridge } from "./qa-bridge.ts";
 import { createReadOnlyQaBackend, DEFAULT_STALE_AFTER_MS } from "./qa-bridge-readonly.ts";
+
+export const QA_BRIDGE_CONFIG_ENV = "GENTLE_DOT_QA_BRIDGE_CONFIG";
 
 export interface QaBridgeSection {
 	activa?: boolean;

@@ -158,8 +158,12 @@ export async function buildRuntime(
 	// The bundle finds these through `import.meta.url`, as the sources do in `src/`.
 	copyFileSync(join(PACKAGE, "src", "identity.md"), join(daemon, "identity.md"));
 	// The engine loads the guard with -e, and the guard imports its siblings.
-	for (const name of ["approval-guard.ts", "screenshot-context.ts"]) {
+	for (const name of ["approval-guard.ts", "screenshot-context.ts", "qa-bridge-tools.ts"]) {
 		copyFileSync(join(PACKAGE, "src", "extensions", name), join(daemon, "extensions", name));
+	}
+	// The QA tools extension imports these three from the daemon folder.
+	for (const name of ["qa-bridge.ts", "qa-bridge-readonly.ts", "qa-bridge-config.ts"]) {
+		copyFileSync(join(PACKAGE, "src", name), join(daemon, name));
 	}
 	if (nativeArtifact) {
 		mkdirSync(join(daemon, "native"), { recursive: true });

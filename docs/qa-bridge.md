@@ -97,8 +97,10 @@ The validated app configuration is:
 - `qa_estado` reports `snapshot.path`, `snapshot.generatedAt`,
   `snapshot.bugs` and `snapshot.stale` without returning the snapshot content.
 - `packages/daemon/src/qa-bridge-config.ts` builds the bridge from this config.
-  The daemon creates it at startup and exposes it as `DotDaemon.qaBridge`, but
-  registers no tools and never calls it on its own.
+  The daemon creates it at startup and exposes it as `DotDaemon.qaBridge`.
+- `packages/daemon/src/extensions/qa-bridge-tools.ts` is loaded into the engine
+  and registers the five read-only tools **only when `activa` is exactly true**.
+  While off it registers nothing; the daemon never calls the bridge on its own.
 - No copy of the JSON is written, and no profile, credential, plugin, CDP or
   SQLite access is added.
 
