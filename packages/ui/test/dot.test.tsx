@@ -52,7 +52,11 @@ describe("DotSurface", () => {
 		expect(rose).toHaveAttribute("aria-hidden", "true");
 		const mask = rose?.querySelector("img.rose-mask");
 		expect(mask).not.toBeNull();
-		expect(mask).toHaveAttribute("src", expect.stringContaining("mascara.svg"));
+		const src = mask?.getAttribute("src") ?? "";
+		expect(src.startsWith("data:image/svg+xml;charset=utf-8,")).toBe(true);
+		const svg = decodeURIComponent(src.slice("data:image/svg+xml;charset=utf-8,".length));
+		expect(svg).toContain('viewBox="0 0 320 404"');
+		expect(svg).toContain("Máscara de VENIRON");
 	});
 
 	it("keeps the Dot surface the same size as its window", () => {
