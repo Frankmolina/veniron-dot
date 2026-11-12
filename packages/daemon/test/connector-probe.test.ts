@@ -175,7 +175,7 @@ describe.skipIf(!enabled)("@real-agent connector probe", () => {
 		const exited = new Promise<void>((resolve) => child.on("close", () => resolve()));
 		const messages: ServerMessage[] = [];
 		try {
-			await waitFor(() => /Gentle Dot is running|failed to start/.test(output), 300_000);
+			await waitFor(() => /VENIRON está en marcha|failed to start/.test(output), 300_000);
 			const port = /127\.0\.0\.1:(\d+)/.exec(output)?.[1];
 			const health = async () =>
 				((await (await fetch(`http://127.0.0.1:${port}/health`)).json()) as { agentState: string })

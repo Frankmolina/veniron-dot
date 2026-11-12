@@ -5,7 +5,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { type DotState, initialState } from "../src/store.ts";
 
-/** Hide the rose and full-screen chat (S26), through the panel and its mocked Tauri commands. */
+/** Ocultar la máscara and full-screen chat (S26), through the panel and its mocked Tauri commands. */
 const h = vi.hoisted(() => ({
 	tauri: true,
 	roseHidden: false,
@@ -84,32 +84,32 @@ describe("hide the rose (S26.1)", () => {
 	it("the panel header hides the rose and then offers to show it again", async () => {
 		await renderApp("?surface=panel");
 		await waitFor(() => expect(invoked("rose_hidden")).toHaveLength(1));
-		await userEvent.click(await screen.findByRole("button", { name: "Hide the rose" }));
+		await userEvent.click(await screen.findByRole("button", { name: "Ocultar la máscara" }));
 		expect(h.invoke).toHaveBeenCalledWith("set_rose_hidden", { hidden: true });
 
-		const show = await screen.findByRole("button", { name: "Show the rose" });
-		expect(show).toHaveAttribute("title", "Show the rose");
+		const show = await screen.findByRole("button", { name: "Mostrar la máscara" });
+		expect(show).toHaveAttribute("title", "Mostrar la máscara");
 		await userEvent.click(show);
 		expect(lastArgs("set_rose_hidden")).toEqual({ hidden: false });
-		await screen.findByRole("button", { name: "Hide the rose" });
+		await screen.findByRole("button", { name: "Ocultar la máscara" });
 	});
 
 	it("starts from the remembered choice and follows the tray", async () => {
 		h.roseHidden = true;
 		await renderApp("?surface=panel");
-		await screen.findByRole("button", { name: "Show the rose" });
+		await screen.findByRole("button", { name: "Mostrar la máscara" });
 
 		await waitFor(() => expect(h.listeners.has("dot://rose")).toBe(true));
 		await act(async () => h.listeners.get("dot://rose")?.({ payload: { hidden: false } }));
-		await screen.findByRole("button", { name: "Hide the rose" });
+		await screen.findByRole("button", { name: "Ocultar la máscara" });
 	});
 
 	it("keeps the computer-control banner, yolo included, while the rose is hidden", async () => {
 		h.roseHidden = true;
 		h.computer = { active: true, endsAt: Date.now() + 60_000, yolo: true };
 		await renderApp("?surface=panel");
-		await screen.findByRole("button", { name: "Show the rose" });
-		const banner = await screen.findByRole("region", { name: "Computer control" });
+		await screen.findByRole("button", { name: "Mostrar la máscara" });
+		const banner = await screen.findByRole("region", { name: "Control del ordenador" });
 		expect(banner).toHaveTextContent(/yolo/i);
 	});
 });
@@ -117,20 +117,20 @@ describe("hide the rose (S26.1)", () => {
 describe("full-screen chat (S26.2)", () => {
 	it("the header button fills the screen and the same button restores it", async () => {
 		const { container } = await renderApp("?surface=panel");
-		await userEvent.click(await screen.findByRole("button", { name: "Full screen" }));
+		await userEvent.click(await screen.findByRole("button", { name: "Pantalla completa" }));
 		expect(h.invoke).toHaveBeenCalledWith("set_panel_fullscreen", { on: true });
-		const exit = await screen.findByRole("button", { name: "Exit full screen" });
+		const exit = await screen.findByRole("button", { name: "Salir de pantalla completa" });
 		expect(chat(container)).toHaveClass("chat-fullscreen");
 
 		await userEvent.click(exit);
 		expect(lastArgs("set_panel_fullscreen")).toEqual({ on: false });
-		await screen.findByRole("button", { name: "Full screen" });
+		await screen.findByRole("button", { name: "Pantalla completa" });
 		expect(chat(container)).not.toHaveClass("chat-fullscreen");
 	});
 
 	it("⌘⇧F toggles full screen while the panel has focus", async () => {
 		const { container } = await renderApp("?surface=panel");
-		await screen.findByRole("button", { name: "Full screen" });
+		await screen.findByRole("button", { name: "Pantalla completa" });
 		fireEvent.keyDown(window, { key: "F", code: "KeyF", metaKey: true, shiftKey: true });
 		await waitFor(() => expect(chat(container)).toHaveClass("chat-fullscreen"));
 		fireEvent.keyDown(window, { key: "F", code: "KeyF", metaKey: true, shiftKey: true });
@@ -143,7 +143,7 @@ describe("full-screen chat (S26.2)", () => {
 
 	it("Esc restores from full screen first and hides the panel only after that", async () => {
 		const { container } = await renderApp("?surface=panel");
-		await userEvent.click(await screen.findByRole("button", { name: "Full screen" }));
+		await userEvent.click(await screen.findByRole("button", { name: "Pantalla completa" }));
 		await waitFor(() => expect(chat(container)).toHaveClass("chat-fullscreen"));
 
 		fireEvent.keyDown(window, { key: "Escape" });
@@ -158,9 +158,9 @@ describe("full-screen chat (S26.2)", () => {
 
 	it("leaves an Esc that something inside the panel already handled alone", async () => {
 		const { container } = await renderApp("?surface=panel");
-		await userEvent.click(await screen.findByRole("button", { name: "Full screen" }));
+		await userEvent.click(await screen.findByRole("button", { name: "Pantalla completa" }));
 		await waitFor(() => expect(chat(container)).toHaveClass("chat-fullscreen"));
-		const box = screen.getByRole("textbox", { name: "Message" });
+		const box = screen.getByRole("textbox", { name: "Mensaje" });
 		box.addEventListener("keydown", (event) => event.preventDefault());
 
 		fireEvent.keyDown(box, { key: "Escape" });
@@ -182,8 +182,8 @@ describe("outside the desktop panel", () => {
 	it("the web page shows neither the full-screen nor the rose button and calls nothing", async () => {
 		h.tauri = false;
 		await renderApp("?#token=web-key");
-		await screen.findByRole("textbox", { name: "Message" });
-		expect(screen.queryByRole("button", { name: "Full screen" })).toBeNull();
+		await screen.findByRole("textbox", { name: "Mensaje" });
+		expect(screen.queryByRole("button", { name: "Pantalla completa" })).toBeNull();
 		expect(screen.queryByRole("button", { name: /the rose/ })).toBeNull();
 		fireEvent.keyDown(window, { key: "F", metaKey: true, shiftKey: true });
 		expect(h.invoke).not.toHaveBeenCalled();
@@ -193,6 +193,6 @@ describe("outside the desktop panel", () => {
 		await renderApp("?surface=dot");
 		await new Promise((resolve) => setTimeout(resolve, 20));
 		expect(invoked("rose_hidden")).toHaveLength(0);
-		expect(screen.queryByRole("button", { name: "Full screen" })).toBeNull();
+		expect(screen.queryByRole("button", { name: "Pantalla completa" })).toBeNull();
 	});
 });

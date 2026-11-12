@@ -18,7 +18,7 @@ import {
 
 const CALLBACK_HOST = "127.0.0.1";
 const CALLBACK_PATH = "/callback";
-export const CLIENT_NAME = "Gentle Dot";
+export const CLIENT_NAME = "VENIRON";
 
 /** The user's own OAuth client and its fixed redirect, when the connector has one. */
 export interface OAuthSettings {
@@ -94,7 +94,7 @@ async function listen(
 		path: callback.path,
 		renderPage: (page: { ok: true } | { ok: false; message: string; details?: string }) =>
 			page.ok
-				? oauthSuccessHtml("Signed in. You can close this page and go back to Gentle Dot.")
+				? oauthSuccessHtml("Sesión iniciada. Puedes cerrar esta página y volver a VENIRON.")
 				: oauthErrorHtml(page.message, page.details),
 	};
 	try {

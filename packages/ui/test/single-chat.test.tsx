@@ -37,19 +37,19 @@ describe("one continuous chat", () => {
 		const { container } = render(
 			<ChatSurface variant="panel" state={single} send={vi.fn()} dismiss={vi.fn()} onHide={vi.fn()} />,
 		);
-		expect(screen.queryByRole("button", { name: "New conversation" })).not.toBeInTheDocument();
-		expect(screen.queryByRole("button", { name: "Conversations" })).not.toBeInTheDocument();
-		expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Gentle Dot");
+		expect(screen.queryByRole("button", { name: "Nueva conversación" })).not.toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: "Conversaciones" })).not.toBeInTheDocument();
+		expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("VENIRON");
 		expect(container.querySelector(".chat-header .rose-glyph")).not.toBeNull();
-		for (const name of ["Accounts", "Profiles", "Hide"]) {
+		for (const name of ["Cuentas", "Perfiles", "Ocultar"]) {
 			expect(screen.getByRole("button", { name })).toBeInTheDocument();
 		}
 	});
 
 	it("brings the conversations back when the flag is on", () => {
 		render(<ChatSurface variant="web" state={withList} send={vi.fn()} dismiss={vi.fn()} />);
-		expect(screen.getByRole("button", { name: "New conversation" })).toBeInTheDocument();
-		expect(screen.getByRole("button", { name: "Conversations" })).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Nueva conversación" })).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Conversaciones" })).toBeInTheDocument();
 		expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("New conversation");
 	});
 });
@@ -95,14 +95,14 @@ describe("recent history", () => {
 		expect(apply(history, { type: "history", messages: [] }).hasEarlier).toBe(false);
 	});
 
-	it("asks for the page before the first message with Show earlier", async () => {
+	it("asks for the page before the first message with Mostrar anteriores", async () => {
 		const send = vi.fn<(m: ClientMessage) => void>();
 		render(<ChatSurface variant="web" state={history} send={send} dismiss={vi.fn()} />);
-		await userEvent.click(screen.getByRole("button", { name: "Show earlier" }));
+		await userEvent.click(screen.getByRole("button", { name: "Mostrar anteriores" }));
 		expect(send).toHaveBeenCalledWith({ type: "get_earlier", before: "s0-5" });
 	});
 
-	it("hides Show earlier when nothing earlier exists", () => {
+	it("hides Mostrar anteriores when nothing earlier exists", () => {
 		render(
 			<ChatSurface
 				variant="web"
@@ -111,25 +111,25 @@ describe("recent history", () => {
 				dismiss={vi.fn()}
 			/>,
 		);
-		expect(screen.queryByRole("button", { name: "Show earlier" })).not.toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: "Mostrar anteriores" })).not.toBeInTheDocument();
 	});
 
 	it("draws one subtle divider where the earlier session ends", () => {
 		const { container } = render(
 			<ChatSurface variant="web" state={history} send={vi.fn()} dismiss={vi.fn()} />,
 		);
-		expect(screen.getAllByRole("separator", { name: "Earlier messages" })).toHaveLength(1);
-		expect(container.querySelector(".earlier-divider")).toHaveTextContent("Earlier messages");
+		expect(screen.getAllByRole("separator", { name: "Mensajes anteriores" })).toHaveLength(1);
+		expect(container.querySelector(".earlier-divider")).toHaveTextContent("Mensajes anteriores");
 		const order = [...container.querySelectorAll(".messages > *")].map((el) =>
 			el.matches(".earlier-divider") ? "divider" : el.textContent,
 		);
-		expect(order.slice(0, 5)).toEqual(["Show earlier", "compact", "Compacted.", "divider", "two"]);
+		expect(order.slice(0, 5)).toEqual(["Mostrar anteriores", "compact", "Compacted.", "divider", "two"]);
 	});
 
 	it("draws no divider when every message is from the current session", () => {
 		const s = apply(single, { type: "history", messages: [turn("s0-1", "user", "hi")] });
 		render(<ChatSurface variant="web" state={s} send={vi.fn()} dismiss={vi.fn()} />);
-		expect(screen.queryByRole("separator", { name: "Earlier messages" })).not.toBeInTheDocument();
+		expect(screen.queryByRole("separator", { name: "Mensajes anteriores" })).not.toBeInTheDocument();
 	});
 });
 
@@ -154,7 +154,7 @@ vi.mock("../src/useDot.ts", () => ({
 	useDot: () => ({ state: dot.state, send: dot.send, dismiss: () => {}, dispatch: () => {} }),
 }));
 
-describe("menu bar New conversation", () => {
+describe("menu bar Nueva conversación", () => {
 	afterEach(() => {
 		desktop.handlers.clear();
 		window.history.replaceState(null, "", "/");

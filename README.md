@@ -7,6 +7,8 @@
 
 <h1>Gentle Dot</h1>
 
+<p>Basado en Gentle Dot de Gentleman Programming (MIT).</p>
+
 <p><strong>A personal assistant that lives on your desktop, remembers what matters, and can use your Mac for you.</strong></p>
 
 

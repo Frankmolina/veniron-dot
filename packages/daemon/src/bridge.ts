@@ -107,7 +107,7 @@ type ProfileCommand = Extract<
 >;
 
 const DIALOG_METHODS = new Set(["select", "confirm", "input", "editor"]);
-const WAITING_IN_APP = "Waiting for your answer in the Gentle Dot app.";
+const WAITING_IN_APP = "Esperando tu respuesta en la app VENIRON.";
 const DECLINED = { code: "declined", message: "Nothing was changed." } as const;
 
 /**

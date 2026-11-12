@@ -59,50 +59,50 @@ const conversations = [
 	{ id: "b.jsonl", title: "Current", updatedAt: "2026-10-08T10:00:00.000Z" },
 	{ id: "a.jsonl", title: "Trip plan", updatedAt: "2026-10-07T10:00:00.000Z" },
 ];
-const QUESTION = "The assistant is still answering. Stop it and open the other conversation?";
+const QUESTION = "El asistente sigue respondiendo. ¿Lo detienes y abres la otra conversación?";
 
 describe("switching while the assistant answers", () => {
-	it("asks first, and Cancel keeps the running answer", async () => {
+	it("asks first, and Cancelar keeps the running answer", async () => {
 		const send = vi.fn();
 		const busy = { ...open, agentState: "thinking" as const, conversationId: "b.jsonl", conversations };
 		render(<ChatSurface variant="web" state={busy} send={send} dismiss={vi.fn()} />);
-		await userEvent.click(screen.getByRole("button", { name: "New conversation" }));
-		const dialog = screen.getByRole("alertdialog", { name: "Stop and switch?" });
+		await userEvent.click(screen.getByRole("button", { name: "Nueva conversación" }));
+		const dialog = screen.getByRole("alertdialog", { name: "¿Detener y cambiar?" });
 		expect(dialog).toHaveTextContent(QUESTION);
 		expect(send).not.toHaveBeenCalled();
-		await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+		await userEvent.click(screen.getByRole("button", { name: "Cancelar" }));
 		expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
 		expect(send).not.toHaveBeenCalled();
 	});
 
-	it("starts a new conversation after Stop and switch", async () => {
+	it("starts a new conversation after Detener y cambiar", async () => {
 		const send = vi.fn();
 		const busy = { ...open, agentState: "working" as const, conversationId: "b.jsonl", conversations };
 		render(<ChatSurface variant="web" state={busy} send={send} dismiss={vi.fn()} />);
-		await userEvent.click(screen.getByRole("button", { name: "New conversation" }));
-		await userEvent.click(screen.getByRole("button", { name: "Stop and switch" }));
+		await userEvent.click(screen.getByRole("button", { name: "Nueva conversación" }));
+		await userEvent.click(screen.getByRole("button", { name: "Detener y cambiar" }));
 		expect(send.mock.calls).toEqual([[{ type: "new_conversation" }]]);
 		expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
 	});
 
-	it("opens the chosen conversation after Stop and switch", async () => {
+	it("opens the chosen conversation after Detener y cambiar", async () => {
 		const send = vi.fn();
 		const busy = { ...open, agentState: "needs_you" as const, conversationId: "b.jsonl", conversations };
 		render(<ChatSurface variant="web" state={busy} send={send} dismiss={vi.fn()} />);
-		await userEvent.click(screen.getByRole("button", { name: "Conversations" }));
+		await userEvent.click(screen.getByRole("button", { name: "Conversaciones" }));
 		send.mockClear();
 		await userEvent.click(screen.getByRole("button", { name: /Trip plan/ }));
-		expect(screen.queryByRole("navigation", { name: "Earlier conversations" })).not.toBeInTheDocument();
-		expect(screen.getByRole("alertdialog", { name: "Stop and switch?" })).toHaveTextContent(QUESTION);
+		expect(screen.queryByRole("navigation", { name: "Conversaciones anteriores" })).not.toBeInTheDocument();
+		expect(screen.getByRole("alertdialog", { name: "¿Detener y cambiar?" })).toHaveTextContent(QUESTION);
 		expect(send).not.toHaveBeenCalled();
-		await userEvent.click(screen.getByRole("button", { name: "Stop and switch" }));
+		await userEvent.click(screen.getByRole("button", { name: "Detener y cambiar" }));
 		expect(send.mock.calls).toEqual([[{ type: "open_conversation", conversationId: "a.jsonl" }]]);
 	});
 
 	it("switches right away when the assistant is idle", async () => {
 		const send = vi.fn();
 		render(<ChatSurface variant="web" state={{ ...open, conversations }} send={send} dismiss={vi.fn()} />);
-		await userEvent.click(screen.getByRole("button", { name: "New conversation" }));
+		await userEvent.click(screen.getByRole("button", { name: "Nueva conversación" }));
 		expect(send).toHaveBeenCalledWith({ type: "new_conversation" });
 		expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
 	});

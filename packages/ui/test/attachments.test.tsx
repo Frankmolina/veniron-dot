@@ -39,8 +39,9 @@ function ComposerWith({ upload, send }: { upload: Uploader; send: Send }) {
 	return <Composer busy={false} disabled={false} send={send} attachments={attachments} />;
 }
 
-const attachInput = () => screen.getByLabelText("Attach files") as HTMLInputElement;
-const chips = () => within(screen.getByRole("list", { name: "Files to send" })).queryAllByRole("listitem");
+const attachInput = () => screen.getByLabelText("Adjuntar archivos") as HTMLInputElement;
+const chips = () =>
+	within(screen.getByRole("list", { name: "Archivos para enviar" })).queryAllByRole("listitem");
 
 describe("attaching files in the composer", () => {
 	it("adds chosen files as chips with name and size, and removes one", async () => {
@@ -51,7 +52,7 @@ describe("attaching files in the composer", () => {
 			expect.stringContaining("photo.png"),
 		]);
 		expect(chips()[0]?.textContent).toContain("2 KB");
-		await userEvent.click(screen.getByRole("button", { name: "Remove notes.txt" }));
+		await userEvent.click(screen.getByRole("button", { name: "Quitar notes.txt" }));
 		expect(chips()).toHaveLength(1);
 	});
 
@@ -64,7 +65,7 @@ describe("attaching files in the composer", () => {
 		const send = vi.fn<(m: ClientMessage) => void>();
 		render(<ComposerWith upload={upload} send={send} />);
 		await userEvent.upload(attachInput(), [file("a.txt"), file("b.txt")]);
-		await userEvent.type(screen.getByRole("textbox", { name: "Message" }), "read these{Enter}");
+		await userEvent.type(screen.getByRole("textbox", { name: "Mensaje" }), "read these{Enter}");
 		await waitFor(() => expect(send).toHaveBeenCalledTimes(1));
 		expect(upload.mock.calls.map(([f, o]) => [f.name, o.uploadId])).toEqual([
 			["a.txt", undefined],
@@ -78,8 +79,8 @@ describe("attaching files in the composer", () => {
 				{ uploadId: "u_first0000000000000", name: "b.txt" },
 			],
 		});
-		expect(screen.queryByRole("list", { name: "Files to send" })).toBeNull();
-		expect(screen.getByRole("textbox", { name: "Message" })).toHaveValue("");
+		expect(screen.queryByRole("list", { name: "Archivos para enviar" })).toBeNull();
+		expect(screen.getByRole("textbox", { name: "Mensaje" })).toHaveValue("");
 	});
 
 	it("Composer keeps the draft and attachments when send is refused", async () => {
@@ -87,41 +88,43 @@ describe("attaching files in the composer", () => {
 		const send = vi.fn<(m: ClientMessage) => boolean>(() => false);
 		render(<ComposerWith upload={upload} send={send} />);
 		await userEvent.upload(attachInput(), [file("a.txt")]);
-		const box = screen.getByRole("textbox", { name: "Message" });
+		const box = screen.getByRole("textbox", { name: "Mensaje" });
 		await userEvent.type(box, "read this{Enter}");
 		await waitFor(() => expect(send).toHaveBeenCalledTimes(1));
 		expect(box).toHaveValue("read this");
 		expect(chips().map((c) => c.textContent)).toEqual([expect.stringContaining("a.txt")]);
-		expect(screen.getByRole("alert", { name: "Not sent" })).toHaveTextContent("Not connected");
+		expect(screen.getByRole("alert", { name: "No enviado" })).toHaveTextContent(
+			"No hay conexión, así que el mensaje no se ha enviado.",
+		);
 
 		// Sending again reuses the uploaded file and clears once the message goes out.
 		send.mockReturnValue(true);
-		await userEvent.click(screen.getByRole("button", { name: "Send" }));
+		await userEvent.click(screen.getByRole("button", { name: "Enviar" }));
 		await waitFor(() => expect(send).toHaveBeenCalledTimes(2));
 		expect(upload).toHaveBeenCalledTimes(1);
 		expect(send.mock.calls[1]?.[0]).toMatchObject({ text: "read this", attachments: [{ name: "a.txt" }] });
 		expect(box).toHaveValue("");
-		expect(screen.queryByRole("list", { name: "Files to send" })).toBeNull();
-		expect(screen.queryByRole("alert", { name: "Not sent" })).toBeNull();
+		expect(screen.queryByRole("list", { name: "Archivos para enviar" })).toBeNull();
+		expect(screen.queryByRole("alert", { name: "No enviado" })).toBeNull();
 	});
 
 	it("a sent message still clears the composer", async () => {
 		const send = vi.fn<(m: ClientMessage) => boolean>(() => true);
 		render(<ComposerWith upload={instantUploader()} send={send} />);
 		await userEvent.upload(attachInput(), [file("a.txt")]);
-		const box = screen.getByRole("textbox", { name: "Message" });
+		const box = screen.getByRole("textbox", { name: "Mensaje" });
 		await userEvent.type(box, "read this{Enter}");
 		await waitFor(() => expect(send).toHaveBeenCalledTimes(1));
 		expect(box).toHaveValue("");
-		expect(screen.queryByRole("list", { name: "Files to send" })).toBeNull();
-		expect(screen.queryByRole("alert", { name: "Not sent" })).toBeNull();
+		expect(screen.queryByRole("list", { name: "Archivos para enviar" })).toBeNull();
+		expect(screen.queryByRole("alert", { name: "No enviado" })).toBeNull();
 	});
 
 	it("sends files without text", async () => {
 		const send = vi.fn<(m: ClientMessage) => void>();
 		render(<ComposerWith upload={instantUploader()} send={send} />);
 		await userEvent.upload(attachInput(), [file("a.txt")]);
-		await userEvent.click(screen.getByRole("button", { name: "Send" }));
+		await userEvent.click(screen.getByRole("button", { name: "Enviar" }));
 		await waitFor(() => expect(send).toHaveBeenCalledTimes(1));
 		expect(send.mock.calls[0]?.[0]).toMatchObject({ type: "send", text: "" });
 	});
@@ -138,10 +141,10 @@ describe("attaching files in the composer", () => {
 		const send = vi.fn();
 		render(<ComposerWith upload={upload} send={send} />);
 		await userEvent.upload(attachInput(), [file("a.txt")]);
-		await userEvent.click(screen.getByRole("button", { name: "Send" }));
-		const bar = await screen.findByRole("progressbar", { name: "Uploading a.txt" });
+		await userEvent.click(screen.getByRole("button", { name: "Enviar" }));
+		const bar = await screen.findByRole("progressbar", { name: "Subiendo a.txt" });
 		expect(bar).toHaveAttribute("value", "0.5");
-		expect(screen.getByRole("button", { name: "Send" })).toBeDisabled();
+		expect(screen.getByRole("button", { name: "Enviar" })).toBeDisabled();
 		await act(async () => finish(uploaded(file("a.txt"))));
 		await waitFor(() => expect(send).toHaveBeenCalledTimes(1));
 	});
@@ -153,11 +156,11 @@ describe("attaching files in the composer", () => {
 		const send = vi.fn();
 		render(<ComposerWith upload={upload} send={send} />);
 		await userEvent.upload(attachInput(), [file("a.txt")]);
-		await userEvent.type(screen.getByRole("textbox", { name: "Message" }), "hi{Enter}");
+		await userEvent.type(screen.getByRole("textbox", { name: "Mensaje" }), "hi{Enter}");
 		const chip = chips()[0] as HTMLElement;
 		expect(await within(chip).findByRole("alert")).toHaveTextContent("too large");
 		expect(send).not.toHaveBeenCalled();
-		expect(screen.getByRole("textbox", { name: "Message" })).toHaveValue("hi");
+		expect(screen.getByRole("textbox", { name: "Mensaje" })).toHaveValue("hi");
 	});
 
 	it("refuses files over the limits before uploading, with a reason on the chip", async () => {
@@ -165,7 +168,7 @@ describe("attaching files in the composer", () => {
 		const first = render(<ComposerWith upload={upload} send={vi.fn()} />);
 		await userEvent.upload(attachInput(), [file("huge.bin", 26 * 1024 * 1024)]);
 		expect(within(chips()[0] as HTMLElement).getByRole("alert")).toHaveTextContent(/25 MB/);
-		expect(screen.getByRole("button", { name: "Send" })).toBeDisabled();
+		expect(screen.getByRole("button", { name: "Enviar" })).toBeDisabled();
 		first.unmount();
 
 		render(<ComposerWith upload={upload} send={vi.fn()} />);
@@ -182,7 +185,7 @@ describe("attaching files in the composer", () => {
 
 	it("adds a pasted image and leaves pasted text alone", async () => {
 		render(<ComposerWith upload={instantUploader()} send={vi.fn()} />);
-		const box = screen.getByRole("textbox", { name: "Message" });
+		const box = screen.getByRole("textbox", { name: "Mensaje" });
 		fireEvent.paste(box, {
 			clipboardData: { files: [file("image.png", 10, "image/png")], types: ["Files"] },
 		});
@@ -194,8 +197,8 @@ describe("attaching files in the composer", () => {
 	it("has no attach button without an uploader, and a plain send is unchanged", async () => {
 		const send = vi.fn();
 		render(<Composer busy={false} disabled={false} send={send} />);
-		expect(screen.queryByLabelText("Attach files")).toBeNull();
-		await userEvent.type(screen.getByRole("textbox", { name: "Message" }), "hello{Enter}");
+		expect(screen.queryByLabelText("Adjuntar archivos")).toBeNull();
+		await userEvent.type(screen.getByRole("textbox", { name: "Mensaje" }), "hello{Enter}");
 		expect(send).toHaveBeenCalledWith({ type: "send", text: "hello", requestId: expect.any(String) });
 	});
 });
@@ -229,7 +232,7 @@ describe("sent messages with files", () => {
 		});
 		expect(s.messages[0]?.attachments).toEqual([{ name: "report.pdf", size: 2048, mime: "application/pdf" }]);
 		render(<MessageList messages={s.messages} />);
-		const list = screen.getByRole("list", { name: "Attached files" });
+		const list = screen.getByRole("list", { name: "Archivos adjuntos" });
 		expect(within(list).getByRole("listitem")).toHaveTextContent("report.pdf");
 		expect(within(list).getByRole("listitem")).toHaveTextContent("2 KB");
 	});

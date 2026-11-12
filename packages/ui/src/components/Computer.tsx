@@ -25,21 +25,21 @@ export interface ComputerControls {
 }
 
 const PERMISSIONS: [ComputerPermission, string][] = [
-	["accessibility", "Accessibility"],
-	["screenRecording", "Screen Recording"],
+	["accessibility", "Accesibilidad"],
+	["screenRecording", "Grabación de pantalla"],
 ];
 
 export const DEBUG_BUILD_NOTE =
-	"Debug builds lose these permissions on every rebuild because macOS ties them to the app's signature; grant them again after updating.";
+	"Las compilaciones de depuración pierden estos permisos en cada recompilación porque macOS los asocia a la firma de la aplicación; concédelos de nuevo después de actualizar.";
 /** Names the panic shortcut only when the app registered it; until it says so, only Stop is promised. */
 const yoloNote = (windows: boolean, panicShortcut: boolean) =>
-	`Yolo mode lets the assistant send, pay, delete, and submit without asking you first. It turns itself off after 1 hour or when the app quits; ${panicShortcut ? `Stop and ${windows ? "Alt+Shift+Esc" : "⌥⇧Esc"} still work` : "Stop still works"}.`;
+	`El modo yolo permite al asistente enviar, pagar, borrar y confirmar sin preguntarte antes. Se desactiva solo al cabo de 1 hora o al salir de la aplicación; ${panicShortcut ? `Detener y ${windows ? "Alt+Shift+Esc" : "⌥⇧Esc"} siguen funcionando` : "Detener sigue funcionando"}.`;
 const WINDOWS_TOO_OLD_NOTE =
-	"Computer control needs Windows 10 version 2004 (build 19041) or newer for screenshots.";
+	"El control del ordenador necesita Windows 10 versión 2004 (compilación 19041) o posterior para las capturas de pantalla.";
 const WINDOWS_UNKNOWN_VERSION_NOTE =
-	"Gentle Dot cannot tell which Windows version this is, so computer control is unavailable: screenshots need Windows 10 version 2004 (build 19041) or newer.";
+	"VENIRON no puede saber qué versión de Windows es esta, así que el control del ordenador no está disponible: las capturas de pantalla necesitan Windows 10 versión 2004 (compilación 19041) o posterior.";
 const NO_IMAGES_NOTE =
-	"The current model does not accept images, so the assistant cannot see your screen. Choose a model that does in Profiles.";
+	"El modelo actual no acepta imágenes, así que el asistente no puede ver tu pantalla. Elige en Perfiles un modelo que sí las acepte.";
 
 interface ComputerBannerProps {
 	session: ComputerSession;
@@ -54,21 +54,24 @@ export function ComputerBanner({ session, yolo, stop }: ComputerBannerProps) {
 		const timer = setInterval(() => setNow(Date.now()), 1000);
 		return () => clearInterval(timer);
 	}, []);
-	const left = session.endsAt === undefined ? "" : ` · ${timeLeft(session.endsAt, now)} left`;
+	const left = session.endsAt === undefined ? "" : ` · ${timeLeft(session.endsAt, now)} restantes`;
 	return (
-		<section className="computer-banner" aria-label="Computer control">
+		<section className="computer-banner" aria-label="Control del ordenador">
 			<span className="computer-banner-light" aria-hidden="true" />
 			<span>
-				Controlling your {isWindows() ? "PC" : "Mac"}
+				Controlando tu {isWindows() ? "PC" : "Mac"}
 				{left}
 			</span>
 			{yolo ? (
-				<span className="chip computer-yolo-chip" title="Risky actions run without asking you first">
+				<span
+					className="chip computer-yolo-chip"
+					title="Las acciones arriesgadas se ejecutan sin preguntarte antes"
+				>
 					Yolo
 				</span>
 			) : null}
 			<button type="button" className="primary" onClick={stop}>
-				Stop
+				Detener
 			</button>
 		</section>
 	);
@@ -93,8 +96,8 @@ export function ComputerEntry({ info, controls }: ComputerEntryProps) {
 	return (
 		<li className="computer-entry" aria-labelledby="connector-computer">
 			<div className="provider-name">
-				<b id="connector-computer">Computer</b>
-				<span className="chip connector-connected">Built in</span>
+				<b id="connector-computer">Ordenador</b>
+				<span className="chip connector-connected">Integrado</span>
 			</div>
 			{info ? (
 				<>
@@ -103,7 +106,7 @@ export function ComputerEntry({ info, controls }: ComputerEntryProps) {
 				</>
 			) : null}
 			{windows ? (
-				<p className="connector-note">Windows asks for no permission for computer control.</p>
+				<p className="connector-note">Windows no pide permiso para el control del ordenador.</p>
 			) : null}
 			{windows ? null : (
 				<ul className="computer-permissions">
@@ -114,18 +117,18 @@ export function ComputerEntry({ info, controls }: ComputerEntryProps) {
 							<li key={kind} aria-labelledby={id}>
 								<span id={id}>{label}</span>
 								<span className={`chip ${allowed ? "connector-connected" : "connector-needs_setup"}`}>
-									{granted === undefined ? "Checking…" : allowed ? "Allowed" : "Not allowed"}
+									{granted === undefined ? "Comprobando…" : allowed ? "Permitido" : "No permitido"}
 								</span>
 								{granted !== undefined && !allowed ? (
 									<button
 										type="button"
 										className="primary"
-										aria-label={`Grant ${label}`}
+										aria-label={`Conceder ${label}`}
 										onClick={() => {
 											requestPermission(kind).then(check, check);
 										}}
 									>
-										Grant
+										Conceder
 									</button>
 								) : null}
 							</li>
@@ -136,7 +139,7 @@ export function ComputerEntry({ info, controls }: ComputerEntryProps) {
 			{windows ? null : (
 				<div className="provider-actions">
 					<button type="button" onClick={check}>
-						Check again
+						Comprobar de nuevo
 					</button>
 				</div>
 			)}
@@ -148,7 +151,7 @@ export function ComputerEntry({ info, controls }: ComputerEntryProps) {
 				</p>
 			) : null}
 			<div className="computer-yolo">
-				<span id="computer-yolo-label">Yolo mode</span>
+				<span id="computer-yolo-label">Modo yolo</span>
 				<button
 					type="button"
 					role="switch"

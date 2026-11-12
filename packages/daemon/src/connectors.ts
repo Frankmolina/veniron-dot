@@ -48,13 +48,13 @@ export { INTEGRITY_KEY_ID } from "./connector-integrity.ts";
 
 /** What windows are told once after a changed `connectors.json` was set aside (S25.6). */
 export const SET_ASIDE_NOTICE =
-	"Connectors were changed while Gentle Dot was closed, so they were set aside. Review them in Connectors.";
+	"Los conectores cambiaron mientras VENIRON estaba cerrado, así que se han apartado. Revísalos en Conectores.";
 /** The app is there but the integrity key could not be read or stored: nothing that needs a secret runs (A1, L120). */
 export const INTEGRITY_UNCHECKED =
-	"Gentle Dot could not check your connectors, so the ones that need a secret stay locked. Restart Gentle Dot to try again.";
+	"VENIRON no ha podido comprobar tus conectores, así que los que necesitan un secreto siguen bloqueados. Reinicia VENIRON para intentarlo de nuevo.";
 /** A signed `connectors.json` was deleted while Gentle Dot was closed (A3, L120). */
 export const MISSING_NOTICE =
-	"Your connectors file was removed while Gentle Dot was closed. Add your connectors again in Connectors.";
+	"El archivo de conectores se quitó mientras VENIRON estaba cerrado. Vuelve a añadirlos en Conectores.";
 
 /** A value the user types in the app (a token, client credentials); kept only in the assistant's private state. */
 export interface SetupField {
@@ -122,8 +122,8 @@ export const CATALOG: readonly CatalogEntry[] = [
 		name: "Notion",
 		server: { url: "https://mcp.notion.com/mcp" },
 		oauth: true,
-		reads: "Search and read your pages, databases, and comments.",
-		sends: "Create and edit pages and add comments, after you approve each one.",
+		reads: "Busca y lee tus páginas, bases de datos y comentarios.",
+		sends: "Crea y edita páginas y añade comentarios, después de que apruebes cada uno.",
 		readOnlyTools: [
 			"notion-search",
 			"notion-fetch",
@@ -139,8 +139,8 @@ export const CATALOG: readonly CatalogEntry[] = [
 		name: "Linear",
 		server: { url: "https://mcp.linear.app/mcp" },
 		oauth: true,
-		reads: "Find and read issues, projects, cycles, and comments.",
-		sends: "Create and update issues, projects, and comments, after you approve each one.",
+		reads: "Busca y lee incidencias, proyectos, ciclos y comentarios.",
+		sends: "Crea y actualiza incidencias, proyectos y comentarios, después de que apruebes cada uno.",
 		readOnlyTools: [
 			"list_issues",
 			"get_issue",
@@ -165,8 +165,9 @@ export const CATALOG: readonly CatalogEntry[] = [
 		name: "Atlassian",
 		server: { url: "https://mcp.atlassian.com/v2/mcp" },
 		oauth: true,
-		reads: "Search and read Jira issues and Confluence pages.",
-		sends: "Create and edit Jira issues and Confluence pages, and comment, after you approve each one.",
+		reads: "Busca y lee incidencias de Jira y páginas de Confluence.",
+		sends:
+			"Crea y edita incidencias de Jira y páginas de Confluence, y comenta, después de que apruebes cada una.",
 		readOnlyTools: [
 			"atlassianUserInfo",
 			"getAccessibleAtlassianResources",
@@ -195,11 +196,12 @@ export const CATALOG: readonly CatalogEntry[] = [
 			env: { DISCORD_TOKEN: placeholder("token") },
 		},
 		fields: [
-			{ key: "token", label: "Bot token (from the Bot page of your Discord application)", secret: true },
+			{ key: "token", label: "Token del bot (en la página Bot de tu aplicación de Discord)", secret: true },
 		],
 		oauth: false,
-		reads: "Read channels, messages, threads, and members in the servers your bot was invited to.",
-		sends: "Send messages and reactions as your bot, after you approve each one. Read only hides them.",
+		reads: "Lee canales, mensajes, hilos y miembros de los servidores a los que invitaste al bot.",
+		sends:
+			"Envía mensajes y reacciones como tu bot, después de que apruebes cada uno. Solo lectura los oculta.",
 		readOnlyTools: [
 			"discord_list_guilds",
 			"discord_get_guild_info",
@@ -224,15 +226,15 @@ export const CATALOG: readonly CatalogEntry[] = [
 		],
 		guide: {
 			steps: [
-				"Open the Discord Developer Portal and choose New Application. Give it a name, for example Gentle Dot.",
-				"Open the Bot page and choose Reset Token. Copy the token and keep it for the last step.",
-				"On the same page, under Privileged Gateway Intents, turn on Message Content Intent and Server Members Intent, then save.",
-				"Open OAuth2, then URL Generator. Check the scope bot, then the permissions View Channels, Read Message History, Send Messages, Send Messages in Threads, and Add Reactions.",
-				"Open the generated address, pick your server, and choose Authorize. The bot can only see the servers you invite it to.",
-				"Choose Continue here and paste the bot token. It stays on this computer, in the assistant's private settings.",
+				"Abre el Discord Developer Portal y elige New Application. Ponle un nombre, por ejemplo VENIRON.",
+				"Abre la página Bot y elige Reset Token. Copia el token y guárdalo para el último paso.",
+				"En la misma página, en Privileged Gateway Intents, activa Message Content Intent y Server Members Intent, y guarda.",
+				"Abre OAuth2 y luego URL Generator. Marca el ámbito bot y los permisos View Channels, Read Message History, Send Messages, Send Messages in Threads y Add Reactions.",
+				"Abre la dirección generada, elige tu servidor y pulsa Authorize. El bot solo ve los servidores a los que lo invites.",
+				"Pulsa Continuar aquí y pega el token del bot. Se queda en este ordenador, en los ajustes privados del asistente.",
 			],
 			links: [{ label: "Discord Developer Portal", url: "https://discord.com/developers/applications" }],
-			note: "This uses a community server, not one made by Discord. Your bot acts in Discord with the permissions you gave it.",
+			note: "Usa un servidor de la comunidad, no uno hecho por Discord. Tu bot actúa en Discord con los permisos que le diste.",
 		},
 	},
 	{
@@ -250,14 +252,14 @@ export const CATALOG: readonly CatalogEntry[] = [
 			CLIENT_ID,
 			{
 				key: "client_secret",
-				label: "Client Secret (leave it empty if your app uses PKCE)",
+				label: "Client Secret (déjalo vacío si tu app usa PKCE)",
 				secret: true,
 				optional: true,
 			},
 		],
 		oauth: true,
-		reads: "Search messages, channels, and people, and read channels, threads, and canvases.",
-		sends: "Send and schedule messages as you, after you approve each one. Read only hides them.",
+		reads: "Busca mensajes, canales y personas, y lee canales, hilos y lienzos.",
+		sends: "Envía y programa mensajes como tú, después de que apruebes cada uno. Solo lectura los oculta.",
 		readOnlyTools: [
 			"slack_search_public",
 			"slack_search_public_and_private",
@@ -273,19 +275,19 @@ export const CATALOG: readonly CatalogEntry[] = [
 		],
 		guide: {
 			steps: [
-				"Open Slack's app page and choose Create New App, then From scratch. Pick your workspace.",
-				"Open OAuth & Permissions. Under Redirect URLs, add the address below and save it.",
-				"On the same page, turn on PKCE (Slack only accepts a redirect to this computer with it).",
-				"Under User Token Scopes, add search:read.public, search:read.private, search:read.users, channels:history, groups:history, im:history, mpim:history, channels:read, groups:read, users:read, canvases:read, reactions:read, and chat:write.",
-				"Open Basic Information and copy the Client ID (and the Client Secret, if you want to use it).",
-				"Choose Continue here, paste them, and approve access in the page that opens.",
+				"Abre la página de apps de Slack y elige Create New App y luego From scratch. Elige tu espacio de trabajo.",
+				"Abre OAuth & Permissions. En Redirect URLs, añade la dirección de abajo y guárdala.",
+				"En la misma página, activa PKCE (Slack solo acepta una redirección a este ordenador con PKCE).",
+				"En User Token Scopes, añade search:read.public, search:read.private, search:read.users, channels:history, groups:history, im:history, mpim:history, channels:read, groups:read, users:read, canvases:read, reactions:read y chat:write.",
+				"Abre Basic Information y copia el Client ID (y el Client Secret, si quieres usarlo).",
+				"Pulsa Continuar aquí, pégalos y aprueba el acceso en la página que se abre.",
 			],
 			links: [
 				{ label: "Slack apps", url: "https://api.slack.com/apps" },
 				{ label: "Slack's MCP server guide", url: "https://docs.slack.dev/ai/slack-mcp-server" },
 			],
 			redirectUrl: SLACK_REDIRECT,
-			note: "Your workspace admin may need to approve the app. With PKCE on, Slack asks you to sign in again every 30 days.",
+			note: "Puede que el administrador del espacio tenga que aprobar la app. Con PKCE activo, Slack te pide iniciar sesión otra vez cada 30 días.",
 		},
 	},
 	{
@@ -302,8 +304,8 @@ export const CATALOG: readonly CatalogEntry[] = [
 		},
 		fields: [CLIENT_ID, { key: "client_secret", label: "Client Secret", secret: true }],
 		oauth: true,
-		reads: "Search and read your email threads, drafts, and labels.",
-		sends: "Draft and send mail as you, after you approve each one. Read only hides them.",
+		reads: "Busca y lee tus hilos de correo, borradores y etiquetas.",
+		sends: "Redacta y envía correo como tú, después de que apruebes cada uno. Solo lectura los oculta.",
 		readOnlyTools: ["search_threads", "get_thread", "get_message", "list_drafts", "list_labels"],
 		guide: {
 			steps: [
@@ -322,7 +324,7 @@ export const CATALOG: readonly CatalogEntry[] = [
 				},
 			],
 			redirectUrl: GMAIL_REDIRECT,
-			note: "Gmail's server is a Developer Preview: your account must be in the Google Workspace Developer Preview Program. While the app is in testing, Google asks you to sign in again every 7 days. The gmail.compose permission lets the assistant draft and send mail: each draft or message asks for your approval first, and read only hides them.",
+			note: "El servidor de Gmail está en Developer Preview: tu cuenta tiene que estar en el Google Workspace Developer Preview Program. Mientras la app esté en pruebas, Google te pide iniciar sesión otra vez cada 7 días. El permiso gmail.compose deja que el asistente redacte y envíe correo: cada borrador o mensaje pide tu aprobación antes, y solo lectura los oculta.",
 		},
 	},
 ];
@@ -351,10 +353,10 @@ const CALL_TIMEOUT_SECONDS = 300;
 
 const COMPUTER_INFO = {
 	id: COMPUTER_ID,
-	name: "Computer",
-	reads: "See your screen during a session you allow in the app.",
+	name: "Ordenador",
+	reads: "Ve tu pantalla durante una sesión que permites en la app.",
 	sends:
-		"Click, type, and open apps on this Mac during that session. The app asks you again before risky actions.",
+		"Hace clic, escribe y abre apps en este Mac durante esa sesión. La app vuelve a preguntarte antes de las acciones arriesgadas.",
 } as const;
 
 /** A server the user added from the assistant's draft or an import. */
@@ -405,8 +407,8 @@ function specOf(id: string, saved: SavedConnector | undefined): ConnectorSpec | 
 	if (!custom) return undefined;
 	return {
 		name: custom.name,
-		reads: custom.description || "Uses the tools of this server.",
-		sends: "Uses every tool of this server, after you approve each action.",
+		reads: custom.description || "Usa las herramientas de este servidor.",
+		sends: "Usa todas las herramientas de este servidor, después de que apruebes cada acción.",
 		readOnlyTools: [],
 		server: custom.server,
 		fields: custom.fields,

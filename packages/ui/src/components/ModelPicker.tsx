@@ -3,6 +3,16 @@ import { type KeyboardEvent, useEffect, useId, useRef, useState } from "react";
 import type { DotAction, ModelsState } from "../store.ts";
 import type { Send } from "./types.ts";
 
+const THINKING_LABELS: Record<ThinkingLevel, string> = {
+	off: "Desactivado",
+	minimal: "Mínimo",
+	low: "Bajo",
+	medium: "Medio",
+	high: "Alto",
+	xhigh: "Muy alto",
+	max: "Máximo",
+};
+
 interface ModelPickerProps {
 	/** The running model's name, as `ready` reports it, until the picker's list arrives. */
 	model?: string;
@@ -143,7 +153,7 @@ export function ModelPicker({ model, models, send, dispatch, disabled }: ModelPi
 				{item.kind === "profile" && item.pick.model ? (
 					<span className="model-option-detail">{item.pick.model}</span>
 				) : null}
-				{isCurrent ? <span className="model-option-detail">In use</span> : null}
+				{isCurrent ? <span className="model-option-detail">En uso</span> : null}
 			</div>
 		);
 	};
@@ -163,23 +173,23 @@ export function ModelPicker({ model, models, send, dispatch, disabled }: ModelPi
 				ref={chip}
 				type="button"
 				className="model-chip"
-				aria-label={`Model: ${shown ?? "not chosen"}`}
-				title="Change the model"
+				aria-label={`Modelo: ${shown ?? "sin elegir"}`}
+				title="Cambiar el modelo"
 				aria-haspopup="dialog"
 				aria-expanded={open}
 				disabled={disabled}
 				onClick={toggle}
 			>
-				<span className="model-chip-name">{shown ?? "Choose a model"}</span>
+				<span className="model-chip-name">{shown ?? "Elegir un modelo"}</span>
 				<span aria-hidden="true">▾</span>
 			</button>
 			{open ? (
-				<div className="model-popover" role="dialog" aria-label="Choose a model" onKeyDown={onKeyDown}>
+				<div className="model-popover" role="dialog" aria-label="Elegir un modelo" onKeyDown={onKeyDown}>
 					<input
 						type="search"
 						className="model-search"
-						aria-label="Search models"
-						placeholder="Search models"
+						aria-label="Buscar modelos"
+						placeholder="Buscar modelos"
 						aria-controls={`${id}-list`}
 						aria-activedescendant={items.length > 0 ? optionId(highlighted) : undefined}
 						// biome-ignore lint/a11y/noAutofocus: the popover opens for typing
@@ -196,24 +206,24 @@ export function ModelPicker({ model, models, send, dispatch, disabled }: ModelPi
 						</p>
 					) : null}
 					{models.next ? (
-						<p className="model-note">{models.next.name} is used from your next message.</p>
+						<p className="model-note">{models.next.name} se usará a partir de tu próximo mensaje.</p>
 					) : null}
-					{!loaded ? <p className="model-note">Loading models…</p> : null}
-					{loaded && items.length === 0 ? <p className="model-note">No models match.</p> : null}
-					<div className="model-list" id={`${id}-list`} role="listbox" aria-label="Models">
+					{!loaded ? <p className="model-note">Cargando modelos…</p> : null}
+					{loaded && items.length === 0 ? <p className="model-note">Ningún modelo coincide.</p> : null}
+					<div className="model-list" id={`${id}-list`} role="listbox" aria-label="Modelos">
 						{groups.map((group) =>
 							renderGroup(
 								group,
 								items.filter((i) => i.kind === "model" && i.group === group),
 							),
 						)}
-						{profiles.length > 0 ? renderGroup("Profiles", profiles) : null}
+						{profiles.length > 0 ? renderGroup("Perfiles", profiles) : null}
 					</div>
 					{current && thinking ? (
 						<label className="model-thinking">
-							<span>Thinking</span>
+							<span>Razonamiento</span>
 							<select
-								aria-label="Thinking"
+								aria-label="Razonamiento"
 								value={current.thinking ?? ""}
 								onChange={(event) =>
 									send({
@@ -226,7 +236,7 @@ export function ModelPicker({ model, models, send, dispatch, disabled }: ModelPi
 							>
 								{thinking.map((level) => (
 									<option key={level} value={level}>
-										{level}
+										{THINKING_LABELS[level]}
 									</option>
 								))}
 							</select>

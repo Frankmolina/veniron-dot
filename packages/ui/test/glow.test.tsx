@@ -76,7 +76,7 @@ const rule = (css: string, selector: string) =>
 	css.match(new RegExp(`\\n${selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} \\{([^}]*)\\}`))?.[1] ?? "";
 
 const originalFrame = window.requestAnimationFrame;
-const originalCancelFrame = window.cancelAnimationFrame;
+const originalCancelarFrame = window.cancelAnimationFrame;
 
 beforeEach(() => {
 	h.invoke.mockReset();
@@ -103,7 +103,7 @@ beforeEach(() => {
 afterEach(() => {
 	vi.useRealTimers();
 	window.requestAnimationFrame = originalFrame;
-	window.cancelAnimationFrame = originalCancelFrame;
+	window.cancelAnimationFrame = originalCancelarFrame;
 	window.history.replaceState(null, "", "/");
 });
 
@@ -180,7 +180,7 @@ describe("GlowSurface (S28)", () => {
 		glow({ kind: "click", x: 10, y: 10 });
 		session(false);
 		expect(marks(root)).toHaveLength(0);
-		// A mark that arrives after Stop, panic, or the timeout is dropped.
+		// A mark that arrives after Detener, panic, or the timeout is dropped.
 		glow({ kind: "click", x: 10, y: 10 });
 		expect(marks(root)).toHaveLength(0);
 		session(true);
@@ -344,7 +344,7 @@ describe("GlowSurface (S28)", () => {
 		const css = stylesheet();
 		expect(rule(css, ".glow-working")).toMatch(/pointer-events: none/);
 		expect(rule(css, ".glow-working")).toMatch(/top: 0/);
-		expect(rule(css, ".glow-working")).toMatch(/#ff2d7a/);
+		expect(rule(css, ".glow-working")).toMatch(/#00b4ff/);
 		expect(rule(css, ".glow-working-light")).toMatch(/animation: glow-travel/);
 		expect(css).toMatch(/@keyframes glow-travel \{/);
 		expect(css).not.toMatch(/\.glow-ring/);

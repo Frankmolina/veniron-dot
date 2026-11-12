@@ -53,8 +53,8 @@ describe("queued messages in the chat", () => {
 			"message message-user message-queued",
 			"message message-user message-queued",
 		]);
-		const queued = screen.getAllByRole("article", { name: "Queued message" });
-		expect(queued.map((q) => within(q).getByText("Queued").textContent)).toEqual(["Queued", "Queued"]);
+		const queued = screen.getAllByRole("article", { name: "Mensaje en cola" });
+		expect(queued.map((q) => within(q).getByText("En cola").textContent)).toEqual(["En cola", "En cola"]);
 		expect(queued.map((q) => q.querySelector(".message-body")?.textContent)).toEqual([
 			"add a summary",
 			"then email it",
@@ -65,7 +65,7 @@ describe("queued messages in the chat", () => {
 	it("shows a queued message even before any answer exists, without the greeting", () => {
 		render(surface(apply(open, { type: "queue", steering: ["hello?"], followUp: [] })));
 		expect(screen.queryByText("Hi! What can I do for you?")).not.toBeInTheDocument();
-		expect(screen.getByRole("article", { name: "Queued message" })).toHaveTextContent("hello?");
+		expect(screen.getByRole("article", { name: "Mensaje en cola" })).toHaveTextContent("hello?");
 	});
 
 	it("turns a queued message into a normal one when the assistant takes it", () => {
@@ -75,7 +75,7 @@ describe("queued messages in the chat", () => {
 			{ type: "queue", steering: ["queued one"], followUp: [] },
 		);
 		const { container, rerender } = render(surface(s));
-		expect(screen.getByRole("article", { name: "Queued message" })).toHaveTextContent("queued one");
+		expect(screen.getByRole("article", { name: "Mensaje en cola" })).toHaveTextContent("queued one");
 		s = apply(
 			s,
 			{ type: "message_done", messageId: "m1", text: "Echo: slow" },
@@ -83,8 +83,8 @@ describe("queued messages in the chat", () => {
 			{ type: "user_message", messageId: "u2", text: "queued one" },
 		);
 		rerender(surface(s));
-		expect(screen.queryByRole("article", { name: "Queued message" })).not.toBeInTheDocument();
-		expect(screen.queryByText("Queued")).not.toBeInTheDocument();
+		expect(screen.queryByRole("article", { name: "Mensaje en cola" })).not.toBeInTheDocument();
+		expect(screen.queryByText("En cola")).not.toBeInTheDocument();
 		const users = [...container.querySelectorAll(".message-user")];
 		expect(users.map((u) => u.textContent)).toEqual(["slow", "queued one"]);
 		expect(users.every((u) => !u.classList.contains("message-queued"))).toBe(true);

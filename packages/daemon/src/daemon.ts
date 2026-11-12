@@ -152,8 +152,8 @@ export function ensureToken(dataDir: string): string {
  * terminal; redirected output (a log file, `docker logs`) says where it is instead.
  */
 export function startupMessage(url: string, dataDir: string, interactive: boolean): string {
-	if (interactive) return `Gentle Dot is running at ${url}`;
-	return `Gentle Dot is running at ${url.split("#")[0]} (the access key is in ${join(dataDir, "token")})`;
+	if (interactive) return `VENIRON está en marcha en ${url}`;
+	return `VENIRON está en marcha en ${url.split("#")[0]} (la clave de acceso está en ${join(dataDir, "token")})`;
 }
 
 /**

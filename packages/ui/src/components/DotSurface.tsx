@@ -4,13 +4,13 @@ import { Rose, type RoseMood } from "../rose/Rose.tsx";
 import { isWindows } from "../shortcut.ts";
 
 const LABELS: Record<AgentState, string> = {
-	starting: "starting",
-	idle: "ready",
-	thinking: "thinking",
-	working: "working",
-	needs_you: "needs your answer",
-	restarting: "restarting",
-	error: "unavailable",
+	starting: "iniciando",
+	idle: "listo",
+	thinking: "pensando",
+	working: "trabajando",
+	needs_you: "necesita tu respuesta",
+	restarting: "reiniciando",
+	error: "no disponible",
 };
 
 const MOODS: Record<AgentState, RoseMood> = {
@@ -30,8 +30,10 @@ interface DotSurfaceProps {
 	connected: boolean;
 	/** The assistant controls the Mac (S24.6); it shows over every other state. */
 	inControl?: boolean;
-	/** Yolo mode is on (S24.9): risky actions run without asking, so the rose says so. */
+	/** Yolo mode is on (S24.9): risky actions run without asking, so the mask says so. */
 	yolo?: boolean;
+	/** Computer control just stopped, including the panic shortcut. */
+	halted?: boolean;
 	toggle: () => void;
 	startDrag: () => void;
 }
@@ -42,18 +44,24 @@ export function DotSurface({
 	connected,
 	inControl = false,
 	yolo = false,
+	halted = false,
 	toggle,
 	startDrag,
 }: DotSurfaceProps) {
 	const press = useRef<{ x: number; y: number; dragging: boolean } | undefined>(undefined);
 	const state = connected ? agentState : "restarting";
-	const label = inControl ? `controlling your ${isWindows() ? "PC" : "Mac"}` : LABELS[state];
+	const label = halted
+		? "parado"
+		: inControl
+			? `controlando tu ${isWindows() ? "PC" : "Mac"}`
+			: LABELS[state];
+	const mood = halted ? "panic" : inControl ? "control" : MOODS[state];
 
 	return (
 		<button
 			type="button"
-			className={`dot dot-${state}${inControl ? " dot-in_control" : ""}${yolo ? " dot-yolo" : ""}`}
-			aria-label={`Gentle Dot: ${label}${yolo ? ", yolo mode on" : ""}`}
+			className={`dot dot-${state}${inControl ? " dot-in_control" : ""}${halted ? " dot-halted" : ""}${yolo ? " dot-yolo" : ""}`}
+			aria-label={`VENIRON: ${label}${yolo ? ", modo yolo activo" : ""}`}
 			onPointerDown={(event) => {
 				if (event.button !== 0) return;
 				press.current = { x: event.clientX, y: event.clientY, dragging: false };
@@ -79,7 +87,7 @@ export function DotSurface({
 			}}
 		>
 			<span className="dot-disc" aria-hidden="true">
-				<Rose mood={inControl ? "control" : MOODS[state]} />
+				<Rose mood={mood} />
 			</span>
 			{state === "needs_you" ? (
 				<span className="dot-badge" aria-hidden="true">

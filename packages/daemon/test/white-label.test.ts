@@ -10,10 +10,10 @@ import {
 
 describe("presentText", () => {
 	it.each([
-		["Gentle Shell ready", "Gentle Dot ready"],
-		["gentle-shell is loading", "Gentle Dot is loading"],
-		["I am el Gentleman.", "I am Gentle Dot."],
-		["Gentle AI review mode is on", "Gentle Dot review mode is on"],
+		["Gentle Shell ready", "VENIRON ready"],
+		["gentle-shell is loading", "VENIRON is loading"],
+		["I am el Gentleman.", "I am VENIRON."],
+		["Gentle AI review mode is on", "VENIRON review mode is on"],
 		["Saved to Engram", "Saved to memory"],
 		["Following ODD", "Following workflow"],
 		["Organic Driven Development keeps it tidy", "my workflow keeps it tidy"],

@@ -62,23 +62,23 @@ describe("connector changes in the web page", () => {
 	it("stay locked with the reason when the server has no PIN mode", () => {
 		render(<Web initial={open()} send={vi.fn()} />);
 		expect(screen.getByText(APP_REQUIRED)).toBeInTheDocument();
-		expect(screen.getByRole("radio", { name: "Read and send" })).toBeDisabled();
+		expect(screen.getByRole("radio", { name: "Leer y enviar" })).toBeDisabled();
 	});
 
 	it("create the PIN on first use, then send the change with it", async () => {
 		const send = vi.fn();
 		render(<Web initial={open({ set: false })} send={send} />);
 		expect(screen.queryByText(APP_REQUIRED)).toBeNull();
-		await userEvent.click(screen.getByRole("radio", { name: "Read and send" }));
-		const dialog = screen.getByRole("dialog", { name: "Create a PIN" });
-		await userEvent.type(within(dialog).getByLabelText("New PIN"), PIN);
-		await userEvent.type(within(dialog).getByLabelText("Repeat the PIN"), "000000");
-		await userEvent.click(within(dialog).getByRole("button", { name: "Continue" }));
-		expect(within(dialog).getByRole("alert")).toHaveTextContent("The two PINs are different.");
+		await userEvent.click(screen.getByRole("radio", { name: "Leer y enviar" }));
+		const dialog = screen.getByRole("dialog", { name: "Crea un PIN" });
+		await userEvent.type(within(dialog).getByLabelText("Nuevo PIN"), PIN);
+		await userEvent.type(within(dialog).getByLabelText("Repite el PIN"), "000000");
+		await userEvent.click(within(dialog).getByRole("button", { name: "Continuar" }));
+		expect(within(dialog).getByRole("alert")).toHaveTextContent("Los dos PIN no coinciden.");
 		expect(send).not.toHaveBeenCalledWith(expect.objectContaining({ type: "pin_set" }));
-		await userEvent.clear(within(dialog).getByLabelText("Repeat the PIN"));
-		await userEvent.type(within(dialog).getByLabelText("Repeat the PIN"), PIN);
-		await userEvent.click(within(dialog).getByRole("button", { name: "Continue" }));
+		await userEvent.clear(within(dialog).getByLabelText("Repite el PIN"));
+		await userEvent.type(within(dialog).getByLabelText("Repite el PIN"), PIN);
+		await userEvent.click(within(dialog).getByRole("button", { name: "Continuar" }));
 		expect(send.mock.calls.map(([m]) => m)).toEqual(
 			expect.arrayContaining([
 				{ type: "pin_set", pin: PIN },
@@ -95,12 +95,12 @@ describe("connector changes in the web page", () => {
 	it("ask for the PIN once it is set, and can be cancelled", async () => {
 		const send = vi.fn();
 		render(<Web initial={open({ set: true })} send={send} />);
-		await userEvent.click(screen.getByRole("radio", { name: "Read and send" }));
-		const dialog = screen.getByRole("dialog", { name: "Enter your PIN" });
-		expect(within(dialog).getByText(/Switch Notion to read and send/)).toBeInTheDocument();
-		await userEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
+		await userEvent.click(screen.getByRole("radio", { name: "Leer y enviar" }));
+		const dialog = screen.getByRole("dialog", { name: "Introduce tu PIN" });
+		expect(within(dialog).getByText(/Cambiar Notion a leer y enviar/)).toBeInTheDocument();
+		await userEvent.click(within(dialog).getByRole("button", { name: "Cancelar" }));
 		expect(send).not.toHaveBeenCalledWith(expect.objectContaining({ type: "pin_command" }));
-		await userEvent.click(screen.getByRole("radio", { name: "Read and send" }));
+		await userEvent.click(screen.getByRole("radio", { name: "Leer y enviar" }));
 		await userEvent.type(screen.getByLabelText("PIN"), `${PIN}{Enter}`);
 		expect(send).toHaveBeenCalledWith({
 			type: "pin_command",
@@ -115,7 +115,7 @@ describe("an approval in the web page", () => {
 	const ask: Ask = {
 		requestId: "pin-1",
 		method: "pin",
-		title: "Allow Notion to create pages?",
+		title: "Permitir Notion to create pages?",
 		message: "The assistant wants to create pages in Notion.\n\ntitle: Plan",
 	};
 
@@ -124,18 +124,18 @@ describe("an approval in the web page", () => {
 		render(<AskCard ask={ask} send={send} pin={{ set: true }} />);
 		expect(screen.getByText(/title: Plan/)).toBeInTheDocument();
 		await userEvent.type(screen.getByLabelText("PIN"), PIN);
-		await userEvent.click(screen.getByRole("button", { name: "Allow" }));
+		await userEvent.click(screen.getByRole("button", { name: "Permitir" }));
 		expect(send).toHaveBeenCalledWith({ type: "pin_approve", requestId: "pin-1", pin: PIN });
-		await userEvent.click(screen.getByRole("button", { name: "Deny" }));
+		await userEvent.click(screen.getByRole("button", { name: "Denegar" }));
 		expect(send).toHaveBeenCalledWith({ type: "ui_response", requestId: "pin-1", confirmed: false });
 	});
 
 	it("creates the PIN first when there is none yet", async () => {
 		const send = vi.fn();
 		render(<AskCard ask={ask} send={send} pin={{ set: false }} />);
-		await userEvent.type(screen.getByLabelText("New PIN"), PIN);
-		await userEvent.type(screen.getByLabelText("Repeat the PIN"), PIN);
-		await userEvent.click(screen.getByRole("button", { name: "Allow" }));
+		await userEvent.type(screen.getByLabelText("Nuevo PIN"), PIN);
+		await userEvent.type(screen.getByLabelText("Repite el PIN"), PIN);
+		await userEvent.click(screen.getByRole("button", { name: "Permitir" }));
 		expect(send.mock.calls.map(([m]) => m)).toEqual([
 			{ type: "pin_set", pin: PIN },
 			{ type: "pin_approve", requestId: "pin-1", pin: PIN },

@@ -33,7 +33,7 @@ export function Composer({
 	const [refused, setRefused] = useState(false);
 	const box = useRef<HTMLTextAreaElement>(null);
 	const recording = voice?.phase === "recording";
-	const voiceStatus = voice?.phase === "transcribing" ? "Transcribing…" : voice?.note;
+	const voiceStatus = voice?.phase === "transcribing" ? "Transcribiendo…" : voice?.note;
 
 	// A dictation to review joins what was already typed, and the cursor waits at its end.
 	const draft = voice?.draft;
@@ -94,17 +94,17 @@ export function Composer({
 	return (
 		<>
 			{refused ? (
-				<p className="voice-status" role="alert" aria-label="Not sent">
-					Not connected, so the message was not sent. It is kept here to send again.
+				<p className="voice-status" role="alert" aria-label="No enviado">
+					No hay conexión, así que el mensaje no se ha enviado. Se conserva aquí para enviarlo otra vez.
 				</p>
 			) : null}
 			{voiceStatus ? (
-				<p className="voice-status" role="status" aria-label="Voice">
+				<p className="voice-status" role="status" aria-label="Voz">
 					{voiceStatus}
 				</p>
 			) : null}
 			{attachments && files.length > 0 ? (
-				<ul className="attachment-chips" aria-label="Files to send">
+				<ul className="attachment-chips" aria-label="Archivos para enviar">
 					{files.map((file) => (
 						<FileChip
 							key={file.id}
@@ -123,12 +123,12 @@ export function Composer({
 				}}
 			>
 				{attachments && !recording ? (
-					<label className="composer-attach" title="Attach files">
+					<label className="composer-attach" title="Adjuntar archivos">
 						<PaperclipIcon />
 						<input
 							type="file"
 							multiple
-							aria-label="Attach files"
+							aria-label="Adjuntar archivos"
 							className="visually-hidden"
 							disabled={disabled || uploading}
 							onChange={(event) => {
@@ -141,17 +141,17 @@ export function Composer({
 				) : null}
 				{recording ? (
 					<div className="voice-recording">
-						<span className="voice-time" role="timer" aria-label="Recording time">
+						<span className="voice-time" role="timer" aria-label="Tiempo de grabación">
 							{formatElapsed(voice.elapsed)}
 						</span>
 						<meter
 							className="voice-meter"
-							aria-label="Microphone level"
+							aria-label="Nivel del micrófono"
 							min={0}
 							max={1}
 							value={voice.level}
 						/>
-						<span className="voice-partial">{voice.partial || "Listening…"}</span>
+						<span className="voice-partial">{voice.partial || "Escuchando…"}</span>
 						<button
 							type="button"
 							role="switch"
@@ -159,13 +159,13 @@ export function Composer({
 							className={`voice-send-option${voice.sendOnStop ? " on" : ""}`}
 							onClick={() => voice.setSendOnStop(!voice.sendOnStop)}
 						>
-							Send when I stop
+							Enviar cuando pare
 						</button>
 						<button
 							type="button"
 							className="voice-cancel"
-							aria-label="Cancel recording"
-							title="Cancel (Esc)"
+							aria-label="Cancelar la grabación"
+							title="Cancelar (Esc)"
 							onClick={voice.cancel}
 						>
 							✕
@@ -174,8 +174,8 @@ export function Composer({
 				) : (
 					<textarea
 						ref={box}
-						aria-label="Message"
-						placeholder={busy ? "Add to what I'm doing…" : "Ask me anything…"}
+						aria-label="Mensaje"
+						placeholder={busy ? "Añade a lo que estoy haciendo…" : "Pregúntame lo que quieras…"}
 						rows={1}
 						value={text}
 						disabled={disabled}
@@ -196,19 +196,19 @@ export function Composer({
 							voice?.stopSpeaking();
 						}}
 					>
-						Stop
+						Detener
 					</button>
 				) : null}
 				{voice?.mic ? (
 					<button
 						type="button"
 						className={`composer-mic${recording ? " composer-mic-on" : ""}`}
-						aria-label={recording ? (voice.sendOnStop ? "Stop and send" : "Stop and review") : "Talk"}
+						aria-label={recording ? (voice.sendOnStop ? "Detener y enviar" : "Detener y revisar") : "Hablar"}
 						title={
 							voice.mic.available
 								? voice.sendOnStop
-									? "Tap to talk, tap again to send"
-									: "Tap to talk, tap again to review before sending"
+									? "Pulsa para hablar y otra vez para enviar"
+									: "Pulsa para hablar y otra vez para revisar antes de enviar"
 								: voice.mic.reason
 						}
 						disabled={disabled || !voice.mic.available || voice.phase === "transcribing"}
@@ -222,8 +222,8 @@ export function Composer({
 						type="submit"
 						className="composer-send"
 						disabled={disabled || uploading || blocked || (text.trim() === "" && files.length === 0)}
-						aria-label="Send"
-						title="Send"
+						aria-label="Enviar"
+						title="Enviar"
 					>
 						<SendIcon />
 					</button>
@@ -244,7 +244,7 @@ function FileChip({ file, locked, remove }: { file: PendingFile; locked: boolean
 			</span>
 			<span className="chip-size">{formatSize(file.file.size)}</span>
 			{file.progress !== undefined ? (
-				<progress className="chip-progress" aria-label={`Uploading ${name}`} max={1} value={file.progress} />
+				<progress className="chip-progress" aria-label={`Subiendo ${name}`} max={1} value={file.progress} />
 			) : null}
 			{problem ? (
 				<span className="chip-error" role="alert">
@@ -254,7 +254,7 @@ function FileChip({ file, locked, remove }: { file: PendingFile; locked: boolean
 			<button
 				type="button"
 				className="chip-remove"
-				aria-label={`Remove ${name}`}
+				aria-label={`Quitar ${name}`}
 				disabled={locked}
 				onClick={remove}
 			>

@@ -72,6 +72,7 @@ export function GlowSurface() {
 	const [fading, setFading] = useState(false);
 	const [still] = useState(prefersReducedMotion);
 	const [operation, setOperation] = useState<number>();
+	const [halted, setHalted] = useState(false);
 	const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 	const ended = useRef(false);
 	const next = useRef(0);
@@ -129,6 +130,7 @@ export function GlowSurface() {
 			onComputerWorking(work),
 			onComputerState((state) => {
 				ended.current = state.session === undefined;
+				if (live) setHalted(state.halted !== undefined);
 				if (live && ended.current) clear();
 			}),
 		];
@@ -164,6 +166,7 @@ export function GlowSurface() {
 					<span className="glow-working-light" />
 				</div>
 			)}
+			{halted ? <div className="glow-halt" aria-hidden="true" /> : null}
 		</>
 	);
 }

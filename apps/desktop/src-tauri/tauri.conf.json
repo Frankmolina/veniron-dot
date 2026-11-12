@@ -1,8 +1,8 @@
 {
 	"$schema": "https://schema.tauri.app/config/2",
-	"productName": "Gentle Dot",
+	"productName": "VENIRON",
 	"version": "0.1.0",
-	"identifier": "dev.gentleman.gentle-dot",
+	"identifier": "app.veniron.dot",
 	"build": {
 		"frontendDist": "../../../packages/ui/dist/app",
 		"devUrl": "http://127.0.0.1:5173",

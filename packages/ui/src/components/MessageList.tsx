@@ -7,13 +7,13 @@ import type { ChatMessage } from "../store.ts";
 import { formatSize } from "../uploads.ts";
 
 const VERBS: Record<ActivityKind, [string, string, string]> = {
-	read: ["Read", "file", "files"],
-	edit: ["Edited", "file", "files"],
-	run: ["Ran", "command", "commands"],
-	search: ["Searched", "time", "times"],
-	memory: ["Used memory", "time", "times"],
-	delegate: ["Asked", "helper", "helpers"],
-	other: ["Did", "step", "steps"],
+	read: ["Leyó", "archivo", "archivos"],
+	edit: ["Editó", "archivo", "archivos"],
+	run: ["Ejecutó", "comando", "comandos"],
+	search: ["Buscó", "vez", "veces"],
+	memory: ["Usó la memoria", "vez", "veces"],
+	delegate: ["Preguntó a", "ayudante", "ayudantes"],
+	other: ["Hizo", "paso", "pasos"],
 };
 
 /** "Read 2 files · Ran 1 command" */
@@ -85,7 +85,7 @@ export function MessageList({
 	if (messages.length === 0 && queued.length === 0) {
 		return (
 			<div className="empty">
-				<p>Hi! What can I do for you?</p>
+				<p>¡Hola! ¿Qué puedo hacer por ti?</p>
 			</div>
 		);
 	}
@@ -93,7 +93,7 @@ export function MessageList({
 		<div className="messages" aria-live="polite">
 			{hasEarlier ? (
 				<button type="button" className="show-earlier" onClick={onShowEarlier}>
-					Show earlier
+					Mostrar anteriores
 				</button>
 			) : null}
 			{messages.map((message, index) => (
@@ -104,7 +104,7 @@ export function MessageList({
 							<div className="message-body message-plain">{message.text}</div>
 						) : null}
 						{message.attachments && message.attachments.length > 0 ? (
-							<ul className="message-attachments" aria-label="Attached files">
+							<ul className="message-attachments" aria-label="Archivos adjuntos">
 								{message.attachments.map((file, i) => (
 									// biome-ignore lint/suspicious/noArrayIndexKey: two files may share a name across folders
 									<li key={i} className="attachment-chip">
@@ -151,8 +151,8 @@ export function MessageList({
 					</article>
 					{index === lastEarlier ? (
 						<div className="earlier-divider">
-							<hr aria-label="Earlier messages" />
-							<span aria-hidden="true">Earlier messages</span>
+							<hr aria-label="Mensajes anteriores" />
+							<span aria-hidden="true">Mensajes anteriores</span>
 							<span className="earlier-line" />
 						</div>
 					) : null}
@@ -163,9 +163,9 @@ export function MessageList({
 					// biome-ignore lint/suspicious/noArrayIndexKey: the same text can be queued twice
 					key={`${i}-${text}`}
 					className="message message-user message-queued"
-					aria-label="Queued message"
+					aria-label="Mensaje en cola"
 				>
-					<span className="queued-label">Queued</span>
+					<span className="queued-label">En cola</span>
 					<div className="message-body message-plain">{text}</div>
 				</article>
 			))}

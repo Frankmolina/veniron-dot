@@ -38,8 +38,8 @@ export function PinForm({ pin, action, onPin, children }: PinFormProps) {
 			className="ask-form pin-form"
 			onSubmit={(event) => {
 				event.preventDefault();
-				if (!PIN_PATTERN.test(value)) return setProblem("Use 6 to 12 digits.");
-				if (!pin.set && repeat !== value) return setProblem("The two PINs are different.");
+				if (!PIN_PATTERN.test(value)) return setProblem("Usa de 6 a 12 dígitos.");
+				if (!pin.set && repeat !== value) return setProblem("Los dos PIN no coinciden.");
 				onPin(value, !pin.set);
 				setValue("");
 				setRepeat("");
@@ -47,13 +47,13 @@ export function PinForm({ pin, action, onPin, children }: PinFormProps) {
 		>
 			{pin.set ? null : (
 				<p className="connector-note">
-					Choose a PIN of 6 to 12 digits. You will need it to change connectors and to allow actions. The
-					assistant never sees it.
+					Elige un PIN de 6 a 12 dígitos. Lo necesitarás para cambiar conectores y para permitir acciones. El
+					asistente nunca lo ve.
 				</p>
 			)}
-			{pin.locked ? <p className="connector-note">Too many wrong PINs. Try again later.</p> : null}
-			{pin.set ? field("PIN", value, setValue) : field("New PIN", value, setValue)}
-			{pin.set ? null : field("Repeat the PIN", repeat, setRepeat)}
+			{pin.locked ? <p className="connector-note">Demasiados PIN incorrectos. Inténtalo más tarde.</p> : null}
+			{pin.set ? field("PIN", value, setValue) : field("Nuevo PIN", value, setValue)}
+			{pin.set ? null : field("Repite el PIN", repeat, setRepeat)}
 			{problem ? <p role="alert">{problem}</p> : null}
 			<button type="submit" className="primary">
 				{action}
@@ -68,20 +68,20 @@ export function describePinCommand(message: ClientMessage, connectors: Connector
 	const name = (id: string) => connectors.find((c) => c.id === id)?.name ?? id;
 	switch (message.type) {
 		case "connector_mode":
-			return `Switch ${name(message.connectorId)} to ${message.mode === "read_write" ? "read and send" : "read only"}?`;
+			return `¿Cambiar ${name(message.connectorId)} a ${message.mode === "read_write" ? "leer y enviar" : "solo lectura"}?`;
 		case "connector_connect":
 		case "connector_signin":
 		case "connector_setup":
-			return `Connect ${name(message.connectorId)}?`;
+			return `¿Conectar ${name(message.connectorId)}?`;
 		case "connector_disconnect":
-			return `Disconnect ${name(message.connectorId)}?`;
+			return `¿Desconectar ${name(message.connectorId)}?`;
 		case "connector_remove":
-			return `Remove ${name(message.connectorId)}?`;
+			return `¿Quitar ${name(message.connectorId)}?`;
 		case "connector_draft_reply":
-			return "Add the connector the assistant drafted?";
+			return "¿Añadir el conector que ha preparado el asistente?";
 		case "connector_import":
-			return `Import ${message.ids.length} ${message.ids.length === 1 ? "server" : "servers"}?`;
+			return `¿Importar ${message.ids.length} ${message.ids.length === 1 ? "servidor" : "servidores"}?`;
 		default:
-			return "Change your connectors?";
+			return "¿Cambiar tus conectores?";
 	}
 }

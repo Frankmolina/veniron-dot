@@ -61,11 +61,11 @@ const MUTED_KEY = "gentle-dot-voice-muted";
 const SEND_KEY = "gentle-dot-voice-send";
 const RECORDING_TYPES = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus"];
 const REASONS = {
-	insecure: "Voice needs a secure page (HTTPS or localhost).",
-	noRecorder: "This browser cannot record audio.",
-	denied: "Microphone access was denied. Allow it to talk to the assistant.",
-	tooLong: "That recording is too long. Keep it under a minute.",
-	empty: "I didn't catch anything. Try again.",
+	insecure: "La voz necesita una página segura (HTTPS o localhost).",
+	noRecorder: "Este navegador no puede grabar audio.",
+	denied: "Se ha denegado el acceso al micrófono. Permítelo para hablar con el asistente.",
+	tooLong: "Esa grabación es demasiado larga. No pases de un minuto.",
+	empty: "No te he oído. Inténtalo de nuevo.",
 } as const;
 
 type Source = { kind: "daemon" | "native" } | { kind: "none"; reason?: string };

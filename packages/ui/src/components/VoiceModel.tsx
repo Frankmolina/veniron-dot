@@ -13,16 +13,16 @@ import {
 const DOWNLOAD_BYTES = 487_170_055;
 
 const ENGINES: Record<VoiceModelStatus["engine"], string> = {
-	parakeet: "Using: local model (Parakeet), works offline",
-	apple: "Using: macOS speech",
-	none: "Voice input needs the local model on this computer",
+	parakeet: "En uso: modelo local (Parakeet), funciona sin conexión",
+	apple: "En uso: voz de macOS",
+	none: "La entrada de voz necesita el modelo local en este ordenador",
 };
 
 /** The chip names the engine that listens now. */
 const CHIPS: Record<VoiceModelStatus["engine"], string> = {
-	parakeet: "Offline",
+	parakeet: "Sin conexión",
 	apple: "macOS",
-	none: "Off",
+	none: "Apagado",
 };
 
 const megabytes = (bytes: number) => `${Math.round(bytes / 1_000_000)} MB`;
@@ -66,7 +66,7 @@ export function VoiceModelEntry() {
 				setProgress({ kind: "verifying" });
 			} else {
 				setProgress(undefined);
-				if (event.state === "failed") setError(event.message ?? "The download did not finish.");
+				if (event.state === "failed") setError(event.message ?? "La descarga no ha terminado.");
 				refresh();
 			}
 		};
@@ -91,31 +91,31 @@ export function VoiceModelEntry() {
 	return (
 		<li className="computer-entry" aria-labelledby="connector-voice">
 			<div className="provider-name">
-				<b id="connector-voice">Voice</b>
+				<b id="connector-voice">Voz</b>
 				{status ? <span className="chip connector-connected">{CHIPS[status.engine]}</span> : null}
 			</div>
 			{status ? <p className="connector-note">{ENGINES[status.engine]}</p> : null}
 			<p className="connector-note">
-				The local model (NVIDIA Parakeet) understands 25 languages, including Spanish, and never sends your
-				voice anywhere. It is optional: nothing downloads until you ask.
+				El modelo local (NVIDIA Parakeet) entiende 25 idiomas, incluido el español, y nunca envía tu voz a
+				ninguna parte. Es opcional: no se descarga nada hasta que lo pidas.
 			</p>
 			{progress?.kind === "downloading" ? (
 				<div className="voice-model-progress">
-					<progress aria-label="Downloading the local voice model" max={100} value={progress.percent} />
-					<span>Downloading… {progress.percent}%</span>
+					<progress aria-label="Descargando el modelo de voz local" max={100} value={progress.percent} />
+					<span>Descargando… {progress.percent}%</span>
 					<button type="button" onClick={() => act(cancelVoiceModel)}>
-						Cancel
+						Cancelar
 					</button>
 				</div>
 			) : progress?.kind === "verifying" ? (
-				<p className="connector-note">Checking and unpacking…</p>
+				<p className="connector-note">Comprobando y descomprimiendo…</p>
 			) : status?.installed ? (
 				<button type="button" onClick={() => act(removeVoiceModel)}>
-					Remove local model ({megabytes(status.bytes ?? 0)})
+					Quitar el modelo local ({megabytes(status.bytes ?? 0)})
 				</button>
 			) : status ? (
 				<button type="button" className="primary" onClick={() => act(downloadVoiceModel)}>
-					Download local voice model ({megabytes(DOWNLOAD_BYTES)})
+					Descargar el modelo de voz local ({megabytes(DOWNLOAD_BYTES)})
 				</button>
 			) : null}
 			{error ? (

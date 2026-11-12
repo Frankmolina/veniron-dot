@@ -17,8 +17,9 @@ export const HIDDEN_NAMES: RegExp[] = [
 
 const REWRITES: [RegExp, string][] = [
 	[/\/gentle:[\w:-]+/gi, ""],
-	[/\bel gentleman\b/gi, "Gentle Dot"],
-	[/\bgentle[ -]?(?:shell|ai|pi)\b/gi, "Gentle Dot"],
+	[/\bel gentleman\b/gi, "VENIRON"],
+	[/\bgentle[ -]?dot\b/gi, "VENIRON"],
+	[/\bgentle[ -]?(?:shell|ai|pi)\b/gi, "VENIRON"],
 	[/\bpi[ -]coding[ -]agent\b/gi, "assistant"],
 	[/\bPi (?:coding agent|agent|runtime|harness)\b/g, "assistant"],
 	[/\borganic driven development\b/gi, "my workflow"],

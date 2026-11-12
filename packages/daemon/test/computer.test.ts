@@ -167,7 +167,7 @@ describe("computer control registration (S24.7)", () => {
 		const listed = await second.find("connectors", (m) => computerOf(m.connectors) !== undefined);
 		expect(computerOf(listed.connectors)).toEqual({
 			id: "computer",
-			name: "Computer",
+			name: "Ordenador",
 			reads: expect.any(String),
 			sends: expect.any(String),
 			added: true,

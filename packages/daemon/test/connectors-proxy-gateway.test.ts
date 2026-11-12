@@ -193,7 +193,7 @@ describe("connectors through the daemon's proxy (regression, S25.4)", () => {
 			requestId: expect.any(String),
 			method: "app",
 			title: "Allow Notion to create pages?",
-			message: "Waiting for your answer in the Gentle Dot app.",
+			message: "Esperando tu respuesta en la app VENIRON.",
 		});
 		await waitFor(() => d.bridge.agentState === "needs_you");
 		raw({ type: "ui_response", requestId: ask.ask.requestId, confirmed: true });

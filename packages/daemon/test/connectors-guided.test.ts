@@ -98,7 +98,7 @@ describe("guided catalog entries", () => {
 			["client_secret", true, false],
 		]);
 		expect(gmail.guide?.redirectUrl).toBe("http://localhost:38418/callback");
-		expect(gmail.guide?.note).toMatch(/7 days/);
+		expect(gmail.guide?.note).toMatch(/7 días/);
 		expect(gmail.guide?.note).toMatch(/Developer Preview/);
 		expect(slack.oauth && gmail.oauth).toBe(true);
 	});
@@ -106,22 +106,23 @@ describe("guided catalog entries", () => {
 	it("describes what each guided connector can send as its permissions allow, and that read only hides it", () => {
 		// Gmail's gmail.compose scope can send mail, so the copy never promises otherwise.
 		const gmail = entry("gmail");
-		expect(gmail.sends).not.toMatch(/never/i);
-		expect(gmail.sends).toMatch(/send/i);
-		expect(gmail.sends).toMatch(/draft/i);
-		expect(gmail.sends).toMatch(/approve each/i);
+		expect(gmail.sends).not.toMatch(/nunca/i);
+		expect(gmail.sends).toMatch(/envía/i);
+		expect(gmail.sends).toMatch(/redacta/i);
+		expect(gmail.sends).toMatch(/apruebes cada/i);
 		expect(gmail.guide?.note).toMatch(/gmail\.compose/);
-		expect(gmail.guide?.note).toMatch(/send/i);
+		expect(gmail.guide?.note).toMatch(/envíe/i);
 		// Slack's guide asks only for chat:write, so it can send and schedule messages, not react or create canvases.
 		const slack = entry("slack");
 		expect(slack.guide?.steps.join(" ")).not.toMatch(/reactions:write|canvases:write/);
-		expect(slack.sends).not.toMatch(/reaction|canvas/i);
-		expect(slack.sends).toMatch(/send/i);
+		expect(slack.sends).not.toMatch(/reacci[oó]n|lienzo/i);
+		expect(slack.sends).toMatch(/envía/i);
 		// Discord's guide gives the bot no Manage Channels permission.
 		const discord = entry("discord");
 		expect(discord.guide?.steps.join(" ")).not.toMatch(/Manage Channels/);
-		expect(discord.sends).not.toMatch(/manage/i);
-		for (const guided of [gmail, slack, discord]) expect(guided.sends, guided.id).toMatch(/read only hides/i);
+		expect(discord.sends).not.toMatch(/gestionar|manage/i);
+		for (const guided of [gmail, slack, discord])
+			expect(guided.sends, guided.id).toMatch(/solo lectura los oculta/i);
 	});
 });
 

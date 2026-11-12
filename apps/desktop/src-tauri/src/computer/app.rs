@@ -28,33 +28,33 @@ pub const STATE_EVENT: &str = "computer://state";
 /// Where the agent just acted, sent to the overlay only (S28).
 pub const GLOW_EVENT: &str = "computer://glow";
 pub const GLOW_WINDOW: &str = "glow";
-pub const GLOW_TITLE: &str = "Gentle Dot Glow";
+pub const GLOW_TITLE: &str = "VENIRON";
 /// ⌥⇧Esc ends the session from anywhere (S24.3).
 pub const PANIC_SHORTCUT: &str = "Alt+Shift+Escape";
 #[cfg(not(windows))]
-pub const GRANT_TEXT: &str = "Allow Gentle Dot to see and control this Mac for 30 minutes?";
+pub const GRANT_TEXT: &str = "¿Permitir que VENIRON vea y controle este Mac durante 30 minutos?";
 #[cfg(windows)]
-pub const GRANT_TEXT: &str = "Allow Gentle Dot to see and control this PC for 30 minutes?";
+pub const GRANT_TEXT: &str = "¿Permitir que VENIRON vea y controle este PC durante 30 minutos?";
 /// Every computer-control dialog defaults to its refusing button (L75 A2).
-pub const GRANT_CHOICE: Choice = Choice { allow: "Allow", refuse: "Deny" };
-pub const CONFIRM_CHOICE: Choice = Choice { allow: "Allow", refuse: "Cancel" };
+pub const GRANT_CHOICE: Choice = Choice { allow: "Permitir", refuse: "Denegar" };
+pub const CONFIRM_CHOICE: Choice = Choice { allow: "Permitir", refuse: "Cancelar" };
 #[cfg(not(windows))]
-pub const YOLO_TEXT: &str = "Turn on yolo mode? Gentle Dot will send, pay, delete, and submit without asking you first, \
-for up to 1 hour. Stop and ⌥⇧Esc still work.";
+pub const YOLO_TEXT: &str = "¿Activar el modo yolo? VENIRON enviará, pagará, borrará y enviará formularios sin preguntarte, \
+durante un máximo de 1 hora. Parar y ⌥⇧Esc siguen funcionando.";
 #[cfg(windows)]
-pub const YOLO_TEXT: &str = "Turn on yolo mode? Gentle Dot will send, pay, delete, and submit without asking you first, \
-for up to 1 hour. Stop and Alt+Shift+Esc still work.";
-pub const YOLO_CHOICE: Choice = Choice { allow: "Turn On", refuse: "Cancel" };
+pub const YOLO_TEXT: &str = "¿Activar el modo yolo? VENIRON enviará, pagará, borrará y enviará formularios sin preguntarte, \
+durante un máximo de 1 hora. Parar y Alt+Mayús+Esc siguen funcionando.";
+pub const YOLO_CHOICE: Choice = Choice { allow: "Activar", refuse: "Cancelar" };
 /// The yolo dialog when the panic shortcut is not registered: it promises only what works.
-pub const YOLO_TEXT_WITHOUT_PANIC: &str = "Turn on yolo mode? Gentle Dot will send, pay, delete, and submit without asking you \
-first, for up to 1 hour. Stop still works.";
+pub const YOLO_TEXT_WITHOUT_PANIC: &str = "¿Activar el modo yolo? VENIRON enviará, pagará, borrará y enviará formularios sin preguntarte, \
+durante un máximo de 1 hora. Parar sigue funcionando.";
 /// Told once at launch when the panic shortcut cannot be registered.
 #[cfg(not(windows))]
-pub const PANIC_UNAVAILABLE_TEXT: &str = "⌥⇧Esc cannot stop computer control: another app or macOS already uses it. \
-Use Stop in the panel or the menu bar instead.";
+pub const PANIC_UNAVAILABLE_TEXT: &str = "⌥⇧Esc no puede parar el control del ordenador: otra app o macOS ya lo usa. \
+Usa Parar en el panel o en la barra de menús.";
 #[cfg(windows)]
-pub const PANIC_UNAVAILABLE_TEXT: &str = "Alt+Shift+Esc cannot stop computer control: another app or Windows already uses \
-it. Use Stop in the panel or the tray menu instead.";
+pub const PANIC_UNAVAILABLE_TEXT: &str = "Alt+Mayús+Esc no puede parar el control del ordenador: otra app o Windows ya lo usa. \
+Usa Parar en el panel o en el menú de la bandeja.";
 
 /// Whether the panic shortcut was registered at launch.
 static PANIC_SHORTCUT_REGISTERED: AtomicBool = AtomicBool::new(false);
@@ -644,8 +644,8 @@ mod tests {
     #[test]
     #[cfg(not(windows))]
     fn the_grant_dialog_asks_exactly_what_the_spec_says() {
-        assert_eq!(GRANT_TEXT, "Allow Gentle Dot to see and control this Mac for 30 minutes?");
-        assert_eq!(GRANT_CHOICE, Choice { allow: "Allow", refuse: "Deny" });
+        assert_eq!(GRANT_TEXT, "¿Permitir que VENIRON vea y controle este Mac durante 30 minutos?");
+        assert_eq!(GRANT_CHOICE, Choice { allow: "Permitir", refuse: "Denegar" });
     }
 
     #[test]
@@ -653,20 +653,20 @@ mod tests {
     fn the_yolo_dialog_says_what_it_skips_and_for_how_long() {
         assert_eq!(
             YOLO_TEXT,
-            "Turn on yolo mode? Gentle Dot will send, pay, delete, and submit without asking you first, \
-for up to 1 hour. Stop and ⌥⇧Esc still work."
+            "¿Activar el modo yolo? VENIRON enviará, pagará, borrará y enviará formularios sin preguntarte, \
+durante un máximo de 1 hora. Parar y ⌥⇧Esc siguen funcionando."
         );
-        assert_eq!(YOLO_CHOICE, Choice { allow: "Turn On", refuse: "Cancel" });
+        assert_eq!(YOLO_CHOICE, Choice { allow: "Activar", refuse: "Cancelar" });
     }
 
     #[test]
     #[cfg(windows)]
     fn windows_dialogs_name_the_pc_and_panic_shortcut() {
-        assert_eq!(GRANT_TEXT, "Allow Gentle Dot to see and control this PC for 30 minutes?");
-        assert_eq!(GRANT_CHOICE, Choice { allow: "Allow", refuse: "Deny" });
-        assert_eq!(YOLO_TEXT, "Turn on yolo mode? Gentle Dot will send, pay, delete, and submit without asking you first, \
-for up to 1 hour. Stop and Alt+Shift+Esc still work.");
-        assert_eq!(YOLO_CHOICE, Choice { allow: "Turn On", refuse: "Cancel" });
+        assert_eq!(GRANT_TEXT, "¿Permitir que VENIRON vea y controle este PC durante 30 minutos?");
+        assert_eq!(GRANT_CHOICE, Choice { allow: "Permitir", refuse: "Denegar" });
+        assert_eq!(YOLO_TEXT, "¿Activar el modo yolo? VENIRON enviará, pagará, borrará y enviará formularios sin preguntarte, \
+durante un máximo de 1 hora. Parar y Alt+Mayús+Esc siguen funcionando.");
+        assert_eq!(YOLO_CHOICE, Choice { allow: "Activar", refuse: "Cancelar" });
     }
 
     #[test]
@@ -674,8 +674,8 @@ for up to 1 hour. Stop and Alt+Shift+Esc still work.");
         assert_eq!(yolo_text(true), YOLO_TEXT);
         assert_eq!(
             yolo_text(false),
-            "Turn on yolo mode? Gentle Dot will send, pay, delete, and submit without asking you first, \
-for up to 1 hour. Stop still works."
+            "¿Activar el modo yolo? VENIRON enviará, pagará, borrará y enviará formularios sin preguntarte, \
+durante un máximo de 1 hora. Parar sigue funcionando."
         );
     }
 
@@ -684,8 +684,8 @@ for up to 1 hour. Stop still works."
     fn a_missing_panic_shortcut_is_explained_once_on_the_mac() {
         assert_eq!(
             PANIC_UNAVAILABLE_TEXT,
-            "⌥⇧Esc cannot stop computer control: another app or macOS already uses it. \
-Use Stop in the panel or the menu bar instead."
+            "⌥⇧Esc no puede parar el control del ordenador: otra app o macOS ya lo usa. \
+Usa Parar en el panel o en la barra de menús."
         );
     }
 
@@ -694,8 +694,8 @@ Use Stop in the panel or the menu bar instead."
     fn a_missing_panic_shortcut_is_explained_once_on_windows() {
         assert_eq!(
             PANIC_UNAVAILABLE_TEXT,
-            "Alt+Shift+Esc cannot stop computer control: another app or Windows already uses it. \
-Use Stop in the panel or the tray menu instead."
+            "Alt+Mayús+Esc no puede parar el control del ordenador: otra app o Windows ya lo usa. \
+Usa Parar en el panel o en el menú de la bandeja."
         );
     }
 

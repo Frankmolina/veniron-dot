@@ -94,11 +94,11 @@ describe("AccountsPanel", () => {
 		const { rerender } = render(
 			<AccountsPanel auth={mixed()} send={vi.fn()} dispatch={dispatch} openUrl={vi.fn()} />,
 		);
-		await userEvent.click(screen.getByRole("button", { name: /Use an API key/ }));
+		await userEvent.click(screen.getByRole("button", { name: /Usar una clave de API/ }));
 		let s = reduce({ ...base(), auth: mixed() }, { type: "auth_started", providerId: "openai" });
 		s = apply(s, { type: "auth_done", flowId: "f1", providerId: "openai", ok: true });
 		rerender(<AccountsPanel auth={s.auth} send={vi.fn()} dispatch={dispatch} openUrl={vi.fn()} />);
-		await userEvent.click(screen.getByRole("button", { name: "Back to accounts" }));
+		await userEvent.click(screen.getByRole("button", { name: "Volver a las cuentas" }));
 		expect(dispatch).toHaveBeenCalledWith({ type: "accounts", open: true });
 		rerender(
 			<AccountsPanel
@@ -108,13 +108,13 @@ describe("AccountsPanel", () => {
 				openUrl={vi.fn()}
 			/>,
 		);
-		expect(screen.getByRole("button", { name: /Use a subscription/ })).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: /Usar una suscripción/ })).toBeInTheDocument();
 	});
 
 	it("asks for the method first, like Pi's /login", () => {
 		render(<AccountsPanel auth={mixed()} send={vi.fn()} dispatch={vi.fn()} openUrl={vi.fn()} />);
-		expect(screen.getByRole("button", { name: /Use a subscription/ })).toBeInTheDocument();
-		expect(screen.getByRole("button", { name: /Use an API key/ })).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: /Usar una suscripción/ })).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: /Usar una clave de API/ })).toBeInTheDocument();
 		expect(screen.queryByRole("searchbox")).toBeNull();
 		expect(screen.queryByText("GitHub Copilot")).toBeNull();
 	});
@@ -122,9 +122,9 @@ describe("AccountsPanel", () => {
 	it("shows connected accounts on the first step and signs out", async () => {
 		const send = vi.fn();
 		render(<AccountsPanel auth={mixed()} send={send} dispatch={vi.fn()} openUrl={vi.fn()} />);
-		const connected = screen.getByRole("region", { name: "Connected" });
+		const connected = screen.getByRole("region", { name: "Conectadas" });
 		expect(within(connected).getByText("OpenAI")).toBeInTheDocument();
-		await userEvent.click(within(connected).getByRole("button", { name: "Sign out of OpenAI" }));
+		await userEvent.click(within(connected).getByRole("button", { name: "Cerrar sesión de OpenAI" }));
 		expect(send).toHaveBeenCalledWith({ type: "auth_logout", providerId: "openai" });
 	});
 
@@ -132,17 +132,17 @@ describe("AccountsPanel", () => {
 		const send = vi.fn();
 		const dispatch = vi.fn();
 		render(<AccountsPanel auth={mixed()} send={send} dispatch={dispatch} openUrl={vi.fn()} />);
-		await userEvent.click(screen.getByRole("button", { name: /Use a subscription/ }));
-		const list = screen.getByRole("region", { name: "Use a subscription" });
+		await userEvent.click(screen.getByRole("button", { name: /Usar una suscripción/ }));
+		const list = screen.getByRole("region", { name: "Usar una suscripción" });
 		expect(
 			within(list)
-				.getAllByRole("button", { name: /^Sign in with/ })
+				.getAllByRole("button", { name: /^Iniciar sesión con/ })
 				.map((b) => b.getAttribute("aria-label")),
-		).toEqual(["Sign in with GitHub Copilot", "Sign in with OpenAI (ChatGPT Plus/Pro)"]);
+		).toEqual(["Iniciar sesión con GitHub Copilot", "Iniciar sesión con OpenAI (ChatGPT Plus/Pro)"]);
 		expect(within(list).getByText("OpenAI Codex")).toBeInTheDocument();
 		expect(within(list).getByText("OpenAI (ChatGPT Plus/Pro)")).toHaveClass("provider-plan");
 		expect(within(list).queryByText("Anthropic")).toBeNull();
-		await userEvent.click(within(list).getByRole("button", { name: "Sign in with GitHub Copilot" }));
+		await userEvent.click(within(list).getByRole("button", { name: "Iniciar sesión con GitHub Copilot" }));
 		expect(dispatch).toHaveBeenCalledWith({ type: "auth_started", providerId: "github-copilot" });
 		expect(send).toHaveBeenCalledWith({ type: "auth_login", providerId: "github-copilot", method: "oauth" });
 	});
@@ -150,16 +150,16 @@ describe("AccountsPanel", () => {
 	it("lists API keys after choosing an API key, with search and a way back", async () => {
 		const send = vi.fn();
 		render(<AccountsPanel auth={mixed()} send={send} dispatch={vi.fn()} openUrl={vi.fn()} />);
-		await userEvent.click(screen.getByRole("button", { name: /Use an API key/ }));
-		const list = screen.getByRole("region", { name: "Use an API key" });
+		await userEvent.click(screen.getByRole("button", { name: /Usar una clave de API/ }));
+		const list = screen.getByRole("region", { name: "Usar una clave de API" });
 		expect(within(list).getByText("Anthropic")).toBeInTheDocument();
 		expect(within(list).queryByText("GitHub Copilot")).toBeNull();
-		await userEvent.type(screen.getByRole("searchbox", { name: "Search providers" }), "open");
+		await userEvent.type(screen.getByRole("searchbox", { name: "Buscar proveedores" }), "open");
 		expect(within(list).queryByText("Anthropic")).toBeNull();
-		await userEvent.click(within(list).getByRole("button", { name: "Use an API key for OpenAI" }));
+		await userEvent.click(within(list).getByRole("button", { name: "Usar una clave de API para OpenAI" }));
 		expect(send).toHaveBeenCalledWith({ type: "auth_login", providerId: "openai", method: "api_key" });
-		await userEvent.click(screen.getByRole("button", { name: "Back" }));
-		expect(screen.getByRole("button", { name: /Use a subscription/ })).toBeInTheDocument();
+		await userEvent.click(screen.getByRole("button", { name: "Atrás" }));
+		expect(screen.getByRole("button", { name: /Usar una suscripción/ })).toBeInTheDocument();
 	});
 
 	it("opens the sign-in page, takes the pasted code, and can cancel", async () => {
@@ -179,12 +179,12 @@ describe("AccountsPanel", () => {
 			},
 		);
 		render(<AccountsPanel auth={s.auth} send={send} dispatch={vi.fn()} openUrl={openUrl} />);
-		await userEvent.click(screen.getByRole("button", { name: "Open the sign-in page" }));
+		await userEvent.click(screen.getByRole("button", { name: "Abrir la página de inicio de sesión" }));
 		expect(openUrl).toHaveBeenCalledWith("https://example.com/a");
 		await userEvent.type(screen.getByPlaceholderText("code"), "abc123");
-		await userEvent.click(screen.getByRole("button", { name: "Continue" }));
+		await userEvent.click(screen.getByRole("button", { name: "Continuar" }));
 		expect(send).toHaveBeenCalledWith({ type: "auth_reply", flowId: "f1", value: "abc123" });
-		await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+		await userEvent.click(screen.getByRole("button", { name: "Cancelar" }));
 		expect(send).toHaveBeenLastCalledWith({ type: "auth_reply", flowId: "f1", cancelled: true });
 	});
 
@@ -227,7 +227,7 @@ describe("AccountsPanel", () => {
 		const { rerender } = render(
 			<AccountsPanel auth={s.auth} send={vi.fn()} dispatch={vi.fn()} openUrl={vi.fn()} />,
 		);
-		expect(screen.getByRole("status")).toHaveTextContent("Connected to Anthropic.");
+		expect(screen.getByRole("status")).toHaveTextContent("Conectado a Anthropic.");
 		s = apply(reduce(base(), { type: "auth_started", providerId: "anthropic" }), {
 			type: "auth_done",
 			flowId: "f9",
@@ -248,7 +248,7 @@ describe("ChatSurface onboarding", () => {
 			{ type: "auth_providers", providers: providers.map((p) => ({ ...p, configured: false })) },
 		);
 		render(<ChatSurface variant="web" state={s} send={vi.fn()} dismiss={vi.fn()} dispatch={dispatch} />);
-		await userEvent.click(screen.getByRole("button", { name: "Connect an AI account" }));
+		await userEvent.click(screen.getByRole("button", { name: "Conectar una cuenta de IA" }));
 		expect(dispatch).toHaveBeenCalledWith({ type: "accounts", open: true });
 	});
 
@@ -273,7 +273,7 @@ describe("ChatSurface onboarding", () => {
 		const dispatch = vi.fn();
 		const send = vi.fn();
 		render(<ChatSurface variant="web" state={base()} send={send} dismiss={vi.fn()} dispatch={dispatch} />);
-		await userEvent.click(screen.getByRole("button", { name: "Accounts" }));
+		await userEvent.click(screen.getByRole("button", { name: "Cuentas" }));
 		expect(dispatch).toHaveBeenCalledWith({ type: "accounts", open: true });
 		expect(send).toHaveBeenCalledWith({ type: "auth_list" });
 	});
