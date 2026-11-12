@@ -76,8 +76,33 @@ imported by the daemon and the bridge remains off by default. The sample is
 `packages/daemon/test/fixtures/qa-bridge-sample.json`; tests use a temporary
 malformed file to prove errors are not returned as data.
 
+## Phase 3 — activation contract (off by default)
+
+The validated app configuration is:
+
+```json
+"qaBridge": {
+  "activa": false,
+  "modo": "passive",
+  "snapshotPath": "~/.qa-reproduction-assistant/veniron-qa-snapshot.json",
+  "staleAfterMs": 86400000
+}
+```
+
+- `activa` must be exactly `true`; the default is off.
+- `snapshotPath` is the only path the bridge reads. It is read in place, never
+  copied, so there is one latest file and no duplicate tester data.
+- `staleAfterMs` defaults to 24 hours. A missing, malformed or older snapshot
+  is reported as `stale: true`; stale data is not presented as current.
+- `qa_estado` reports `snapshot.path`, `snapshot.generatedAt`,
+  `snapshot.bugs` and `snapshot.stale` without returning the snapshot content.
+- `packages/daemon/src/qa-bridge-config.ts` builds the bridge from this config.
+  It is not imported by the daemon and registers no tools.
+- No copy of the JSON is written, and no profile, credential, plugin, CDP or
+  SQLite access is added.
+
 ## Next phases (only after approval)
 
-1. Review this adapter and decide the real read-only source.
+1. Wire the factory behind the off switch and test the six read-only states.
 2. Local drafts with the existing approval dialog; no submission.
 3. Browser/reservation actions one at a time, each with its own scope and tests.

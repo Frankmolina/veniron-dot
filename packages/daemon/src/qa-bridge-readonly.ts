@@ -6,7 +6,13 @@
  * network, the QA plugin or any profile, and it never writes.
  */
 import { readFileSync } from "node:fs";
-import { type QaBridgeArgs, type QaBridgeBackend, QaBridgeError, type QaBridgeResult } from "./qa-bridge.ts";
+import {
+	type QaBridgeArgs,
+	type QaBridgeBackend,
+	QaBridgeError,
+	type QaBridgeResult,
+	type QaBridgeSnapshotState,
+} from "./qa-bridge.ts";
 
 export interface QaSnapshotBug {
 	number: string;
@@ -34,10 +40,16 @@ export interface QaSnapshot {
 	duplicates: QaSnapshotCandidate[];
 }
 
+export const DEFAULT_STALE_AFTER_MS = 24 * 60 * 60 * 1000;
+
 export interface ReadOnlyQaBackendOptions {
 	/** JSON snapshot produced outside this process. No default: the caller must choose it. */
 	snapshotPath: string;
 	maxCandidates?: number;
+	/** A snapshot older than this is reported as stale. Default: 24 hours. */
+	staleAfterMs?: number;
+	/** Test seam for deterministic freshness checks. */
+	now?: () => number;
 }
 
 function esObjetoPlano(valor: unknown): valor is Record<string, unknown> {
@@ -114,11 +126,14 @@ export function similitudTitulo(a: string, b: string): number {
 export function createReadOnlyQaBackend({
 	snapshotPath,
 	maxCandidates = 10,
+	staleAfterMs = DEFAULT_STALE_AFTER_MS,
+	now = Date.now,
 }: ReadOnlyQaBackendOptions): QaBridgeBackend {
 	if (typeof snapshotPath !== "string" || snapshotPath.trim() === "") {
 		throw new QaBridgeError("INVALID_INPUT", "Falta snapshotPath para el adaptador QA.");
 	}
 	const limite = Number.isInteger(maxCandidates) && maxCandidates > 0 ? maxCandidates : 10;
+	const caducidad = Number.isFinite(staleAfterMs) && staleAfterMs > 0 ? staleAfterMs : DEFAULT_STALE_AFTER_MS;
 
 	function cargar(): QaSnapshot {
 		let crudo: string;
@@ -203,10 +218,27 @@ export function createReadOnlyQaBackend({
 		};
 	}
 
+	function estado(): QaBridgeSnapshotState {
+		try {
+			const snapshot = cargar();
+			const generado = snapshot.generatedAt === undefined ? Number.NaN : Date.parse(snapshot.generatedAt);
+			const stale = !Number.isFinite(generado) || now() - generado > caducidad;
+			return {
+				path: snapshotPath,
+				generatedAt: snapshot.generatedAt ?? null,
+				bugs: snapshot.bugs.length,
+				stale,
+			};
+		} catch {
+			return { path: snapshotPath, generatedAt: null, bugs: 0, stale: true };
+		}
+	}
+
 	return {
 		qa_scan: scan,
 		qa_disponibles: disponibles,
 		qa_duplicados: duplicados,
 		qa_pasos: pasos,
+		estado,
 	};
 }
