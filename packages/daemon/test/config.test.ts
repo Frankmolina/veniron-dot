@@ -191,3 +191,40 @@ describe("loadConfig", () => {
 		);
 	});
 });
+
+describe("qaBridge config", () => {
+	it("defaults to off, passive, no path and a 24-hour staleness window", () => {
+		const dataDir = tempDir();
+		expect(loadConfig({ GENTLE_DOT_DATA_DIR: dataDir }).qaBridge).toEqual({
+			activa: false,
+			modo: "passive",
+			snapshotPath: "",
+			staleAfterMs: 86_400_000,
+		});
+	});
+
+	it("reads the fixed snapshot path without turning the bridge on", () => {
+		const dataDir = tempDir();
+		writeFileSync(
+			join(dataDir, "config.json"),
+			JSON.stringify({
+				qaBridge: {
+					snapshotPath: "~/.qa-reproduction-assistant/veniron-qa-snapshot.json",
+					staleAfterMs: 3_600_000,
+				},
+			}),
+		);
+		expect(loadConfig({ GENTLE_DOT_DATA_DIR: dataDir }).qaBridge).toEqual({
+			activa: false,
+			modo: "passive",
+			snapshotPath: "~/.qa-reproduction-assistant/veniron-qa-snapshot.json",
+			staleAfterMs: 3_600_000,
+		});
+	});
+
+	it("refuses a malformed qaBridge instead of guessing", () => {
+		const dataDir = tempDir();
+		writeFileSync(join(dataDir, "config.json"), JSON.stringify({ qaBridge: { activa: "yes" } }));
+		expect(() => loadConfig({ GENTLE_DOT_DATA_DIR: dataDir })).toThrow(/qaBridge\.activa/);
+	});
+});

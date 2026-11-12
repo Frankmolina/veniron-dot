@@ -1,9 +1,10 @@
 /**
  * Phase 3 factory: build the read-only QA bridge from the app config.
  *
- * Nothing imports this module from the daemon, no tools are registered and the
- * switch defaults to off. It reads the snapshot in place; it never copies it,
- * calls the QA plugin, opens SQLite/CDP or touches profiles.
+ * The daemon imports it at startup, but it registers no tools and never calls
+ * the bridge on its own. The switch defaults to off. It reads the snapshot in
+ * place; it never copies it, calls the QA plugin, opens SQLite/CDP or touches
+ * profiles.
  */
 import { homedir } from "node:os";
 import { join } from "node:path";
