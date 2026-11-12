@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 404" role="img" aria-label="Máscara de VENIRON">
+  <defs>
+    <linearGradient id="hueso" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbf6ee"/>
+      <stop offset="48%" stop-color="#f3e6d4"/>
+      <stop offset="100%" stop-color="#e3cfb6"/>
+    </linearGradient>
+    <radialGradient id="frente" cx="50%" cy="24%" r="40%">
+      <stop offset="0%" stop-color="#fffaf4" stop-opacity="0.85"/>
+      <stop offset="70%" stop-color="#fffaf4" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="mejilla" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ee9d90" stop-opacity="0.95"/>
+      <stop offset="42%" stop-color="#ee9d90" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#ee9d90" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="copa" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#2a241f"/>
+      <stop offset="44%" stop-color="#141210"/>
+      <stop offset="100%" stop-color="#070605"/>
+    </linearGradient>
+  </defs>
+  <g class="dibujo">
+    <path class="rostro" fill="url(#hueso)" d="M160 122C196 120 222 138 234 166C248 196 254 230 250 260C246 292 232 318 212 334C196 348 178 360 160 362C142 360 124 348 108 334C88 318 74 292 70 260C66 230 72 196 86 166C98 138 124 120 160 122Z"/>
+    <path fill="url(#frente)" d="M160 122C196 120 222 138 234 166C248 196 254 230 250 260C246 292 232 318 212 334C196 348 178 360 160 362C142 360 124 348 108 334C88 318 74 292 70 260C66 230 72 196 86 166C98 138 124 120 160 122Z"/>
+    <path class="contorno" fill="none" stroke="#1a1410" stroke-width="2.6" d="M160 122C196 120 222 138 234 166C248 196 254 230 250 260C246 292 232 318 212 334C196 348 178 360 160 362C142 360 124 348 108 334C88 318 74 292 70 260C66 230 72 196 86 166C98 138 124 120 160 122Z"/>
+    <ellipse class="mejilla" cx="104" cy="262" rx="36" ry="26" fill="url(#mejilla)"/>
+    <ellipse class="mejilla" cx="216" cy="262" rx="36" ry="26" fill="url(#mejilla)"/>
+    <ellipse fill="#f3c2b6" fill-opacity="0.55" cx="160" cy="308" rx="28" ry="10"/>
+    <path class="nariz" fill="#d4c0a8" d="M160 214C150 228 146 240 154 252C158 258 162 258 166 252C174 240 170 228 160 214Z"/>
+    <path class="nariz" fill="#f8f1e6" d="M160 220C155 230 154 240 158 250C160 244 163 232 160 220Z"/>
+    <ellipse class="nariz" cx="150" cy="254" rx="4" ry="2.6" fill="#4a3b32"/>
+    <ellipse class="nariz" cx="170" cy="254" rx="4" ry="2.6" fill="#4a3b32"/>
+    <g class="rasgos" fill="#161311" stroke="#161311" stroke-linecap="round" stroke-linejoin="round">
+      <path class="ceja" d="M94 178Q122 160 150 182" fill="none" stroke-width="3.2"/>
+      <path class="ceja" d="M170 182Q198 160 226 178" fill="none" stroke-width="3.2"/>
+      <path class="ojo" d="M100 198C116 192 134 194 146 202C134 207 116 207 100 198Z" stroke="none"/>
+      <path class="ojo" d="M220 198C204 192 186 194 174 202C186 207 204 207 220 198Z" stroke="none"/>
+      <path class="ojo" d="M94 198C88 196 82 200 80 206" fill="none" stroke-width="1.3"/>
+      <path class="ojo" d="M92 206C86 208 82 212 80 216" fill="none" stroke-width="1.15"/>
+      <path class="ojo" d="M226 198C232 196 238 200 240 206" fill="none" stroke-width="1.3"/>
+      <path class="ojo" d="M228 206C234 208 238 212 240 216" fill="none" stroke-width="1.15"/>
+      <ellipse class="brillo" cx="118" cy="198" rx="2.6" ry="1.3" fill="#fbf7f0" stroke="none"/>
+      <ellipse class="brillo" cx="202" cy="198" rx="2.6" ry="1.3" fill="#fbf7f0" stroke="none"/>
+      <path class="bigote" d="M102 262C118 274 140 280 158 276" fill="none" stroke-width="13" stroke-linecap="round"/>
+      <path class="bigote" d="M162 276C180 280 202 274 218 262" fill="none" stroke-width="13" stroke-linecap="round"/>
+      <path class="sonrisa" d="M104 304Q160 316 216 304" fill="none" stroke-width="2.4"/>
+      <path class="perilla" d="M160 320C172 324 174 342 160 372C148 342 148 324 160 320Z" stroke="none"/>
+    </g>
+    <g class="sombrero" transform="rotate(-10 160 128)">
+      <path class="ala" fill="#100e0c" d="M14 128C74 80 246 80 306 134C246 166 74 166 14 128Z"/>
+      <path class="ala-luz" fill="#2c2622" d="M48 126C96 98 224 98 272 132C224 152 96 152 48 126Z"/>
+      <path class="copa" fill="url(#copa)" d="M114 126L120 14C136 -2 184 -2 200 14L206 126Z"/>
+      <path class="banda" fill="#3a3026" d="M116 86H204L208 104H112Z"/>
+    </g>
+  </g>
+</svg>
