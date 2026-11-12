@@ -26,11 +26,20 @@ export interface QaBridgeConfig {
 
 export type QaBridgeBackendMethod = (args: QaBridgeArgs) => Promise<QaBridgeResult>;
 
+export interface QaBridgeSnapshotState {
+	path: string;
+	generatedAt: string | null;
+	bugs: number;
+	stale: boolean;
+}
+
 export interface QaBridgeBackend {
 	qa_scan?: QaBridgeBackendMethod;
 	qa_disponibles?: QaBridgeBackendMethod;
 	qa_duplicados?: QaBridgeBackendMethod;
 	qa_pasos?: QaBridgeBackendMethod;
+	/** Optional read-only metadata for qa_estado; never reads the snapshot content. */
+	estado?: () => QaBridgeSnapshotState;
 }
 
 export interface QaBridgeState extends Record<string, unknown> {
@@ -39,6 +48,7 @@ export interface QaBridgeState extends Record<string, unknown> {
 	backend: string | null;
 	herramientas: QaBridgeTool[];
 	soloLectura: true;
+	snapshot?: QaBridgeSnapshotState;
 }
 
 export interface QaBridge {
@@ -79,12 +89,19 @@ export function createQaBridge({
 	const nombreBackend = typeof config.backend === "string" && config.backend ? config.backend : null;
 
 	function estado(): QaBridgeState {
+		let snapshot: QaBridgeSnapshotState | undefined;
+		try {
+			snapshot = backend?.estado?.();
+		} catch {
+			snapshot = undefined;
+		}
 		return {
 			activa,
 			modo,
 			backend: nombreBackend,
 			herramientas: [...QA_BRIDGE_READ_TOOLS],
 			soloLectura: true,
+			...(snapshot === undefined ? {} : { snapshot }),
 		};
 	}
 

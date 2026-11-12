@@ -95,3 +95,47 @@ describe("read-only QA JSON adapter", () => {
 		expect(similitudTitulo("carrito", "pago")).toBe(0);
 	});
 });
+
+describe("read-only QA snapshot status", () => {
+	it("returns path, date and count without exposing content", () => {
+		const backend = createReadOnlyQaBackend({
+			snapshotPath: fixture,
+			now: () => Date.parse("2026-11-12T18:30:00.000Z"),
+		});
+		const bridge = createQaBridge({
+			config: { activa: true, modo: "passive", backend: "json-snapshot" },
+			backend,
+		});
+		expect(bridge.estado().snapshot).toEqual({
+			path: fixture,
+			generatedAt: "2026-11-12T18:00:00.000Z",
+			bugs: 2,
+			stale: false,
+		});
+	});
+
+	it("marks an old snapshot as stale and a missing one as stale with zero bugs", () => {
+		const old = createReadOnlyQaBackend({
+			snapshotPath: fixture,
+			staleAfterMs: 1,
+			now: () => Date.parse("2026-11-12T19:00:00.000Z"),
+		});
+		const bridge = createQaBridge({
+			config: { activa: true, modo: "passive", backend: "json-snapshot" },
+			backend: old,
+		});
+		expect(bridge.estado().snapshot).toMatchObject({ path: fixture, bugs: 2, stale: true });
+
+		const missing = createReadOnlyQaBackend({ snapshotPath: "/does/not/exist.json" });
+		const missingBridge = createQaBridge({
+			config: { activa: true, modo: "passive", backend: "json-snapshot" },
+			backend: missing,
+		});
+		expect(missingBridge.estado().snapshot).toEqual({
+			path: "/does/not/exist.json",
+			generatedAt: null,
+			bugs: 0,
+			stale: true,
+		});
+	});
+});
