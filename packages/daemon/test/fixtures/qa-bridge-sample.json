@@ -1,0 +1,48 @@
+{
+	"version": 1,
+	"generatedAt": "2026-11-12T18:00:00.000Z",
+	"cycle": {
+		"platform": "testio",
+		"url": "https://example.test/testcycles/demo",
+		"title": "Tienda de ejemplo"
+	},
+	"bugs": [
+		{
+			"number": "1001",
+			"title": "El carrito se vacía al recargar",
+			"status": "reported",
+			"feature": "Carrito",
+			"steps": ["Abrir la tienda", "Añadir una camiseta al carrito", "Recargar la página"],
+			"actual": "El carrito queda vacío",
+			"expected": "El producto sigue en el carrito"
+		},
+		{
+			"number": "1002",
+			"title": "El cupón no se aplica al cambiar de moneda",
+			"status": "reported",
+			"feature": "Pago",
+			"steps": ["Añadir un producto", "Aplicar el cupón BRUMA10", "Cambiar la moneda"],
+			"actual": "El total no descuenta el cupón",
+			"expected": "El descuento se mantiene"
+		}
+	],
+	"available": [
+		{
+			"number": "1001",
+			"title": "El carrito se vacía al recargar",
+			"device": "Mac OS 27.0.1, Chrome"
+		}
+	],
+	"duplicates": [
+		{
+			"number": "900",
+			"title": "Carrito vacío después de recargar",
+			"status": "known"
+		},
+		{
+			"number": "901",
+			"title": "El cupón desaparece al cambiar de moneda",
+			"status": "known"
+		}
+	]
+}
