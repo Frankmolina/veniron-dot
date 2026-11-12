@@ -107,25 +107,25 @@ describe("profiles state", () => {
 describe("ProfilesPanel", () => {
 	it("lists profiles, marks the one in use, and switches with Use", async () => {
 		const { send } = panel();
-		expect(within(item("quick")).getByText("In use")).toBeInTheDocument();
-		expect(within(item("quick")).queryByRole("button", { name: "Use" })).toBeNull();
-		expect(within(item("quick")).getByRole("button", { name: "Delete" })).toBeDisabled();
-		expect(within(item("deep")).getByText("Main assistant: Fake Model · High")).toBeInTheDocument();
-		await userEvent.click(within(item("deep")).getByRole("button", { name: "Use" }));
+		expect(within(item("quick")).getByText("En uso")).toBeInTheDocument();
+		expect(within(item("quick")).queryByRole("button", { name: "Usar" })).toBeNull();
+		expect(within(item("quick")).getByRole("button", { name: "Eliminar" })).toBeDisabled();
+		expect(within(item("deep")).getByText("Main assistant: Fake Model · Alto")).toBeInTheDocument();
+		await userEvent.click(within(item("deep")).getByRole("button", { name: "Usar" }));
 		expect(send).toHaveBeenCalledWith({ type: "profile_apply", name: "deep" });
 	});
 
 	it("edits a profile per role with models grouped by provider and keeps routes it does not show", async () => {
 		const { send } = panel();
-		await userEvent.click(within(item("deep")).getByRole("button", { name: "Edit" }));
-		const model = screen.getByRole("combobox", { name: "Builder model" });
+		await userEvent.click(within(item("deep")).getByRole("button", { name: "Editar" }));
+		const model = screen.getByRole("combobox", { name: "Builder modelo" });
 		const groups = [...model.querySelectorAll("optgroup")].map((g) => g.label);
 		expect(groups).toEqual(["Fake Cloud", "other"]);
-		expect(within(model).getByRole("option", { name: "Default" })).toBeInTheDocument();
+		expect(within(model).getByRole("option", { name: "Predeterminado" })).toBeInTheDocument();
 		await userEvent.selectOptions(model, "other/big");
-		await userEvent.selectOptions(screen.getByRole("combobox", { name: "Builder thinking" }), "low");
-		await userEvent.selectOptions(screen.getByRole("combobox", { name: "Main assistant thinking" }), "");
-		await userEvent.click(screen.getByRole("button", { name: "Save" }));
+		await userEvent.selectOptions(screen.getByRole("combobox", { name: "Builder razonamiento" }), "low");
+		await userEvent.selectOptions(screen.getByRole("combobox", { name: "Main assistant razonamiento" }), "");
+		await userEvent.click(screen.getByRole("button", { name: "Guardar" }));
 		expect(send).toHaveBeenCalledWith({
 			type: "profile_save",
 			name: "deep",
@@ -144,27 +144,27 @@ describe("ProfilesPanel", () => {
 			profiles: [{ name: "gone", roles: { orchestrator: { model: "anthropic/opus" } } }],
 		});
 		panel(state);
-		await userEvent.click(within(item("gone")).getByRole("button", { name: "Edit" }));
-		expect(screen.getByRole("combobox", { name: "Main assistant model" })).toHaveValue("anthropic/opus");
-		expect(screen.getByRole("option", { name: "anthropic/opus (not available)" })).toBeInTheDocument();
+		await userEvent.click(within(item("gone")).getByRole("button", { name: "Editar" }));
+		expect(screen.getByRole("combobox", { name: "Main assistant modelo" })).toHaveValue("anthropic/opus");
+		expect(screen.getByRole("option", { name: "anthropic/opus (no disponible)" })).toBeInTheDocument();
 	});
 
 	it("creates a new profile only with a valid, unused name", async () => {
 		const { send } = panel();
-		await userEvent.click(screen.getByRole("button", { name: "New profile" }));
-		const name = screen.getByRole("textbox", { name: "Profile name" });
-		const save = screen.getByRole("button", { name: "Save" });
+		await userEvent.click(screen.getByRole("button", { name: "Nuevo perfil" }));
+		const name = screen.getByRole("textbox", { name: "Nombre del perfil" });
+		const save = screen.getByRole("button", { name: "Guardar" });
 		expect(save).toBeDisabled();
 		await userEvent.type(name, "has space");
 		expect(save).toBeDisabled();
-		expect(screen.getByText(/letters, numbers, dots, dashes, or underscores/)).toBeInTheDocument();
+		expect(screen.getByText(/letras, números, puntos, guiones o guiones bajos/)).toBeInTheDocument();
 		await userEvent.clear(name);
 		await userEvent.type(name, "quick");
-		expect(screen.getByText("A profile with that name already exists.")).toBeInTheDocument();
+		expect(screen.getByText("Ya existe un perfil con ese nombre.")).toBeInTheDocument();
 		await userEvent.clear(name);
 		await userEvent.type(name, "focus");
 		await userEvent.selectOptions(
-			screen.getByRole("combobox", { name: "Main assistant model" }),
+			screen.getByRole("combobox", { name: "Main assistant modelo" }),
 			"fake/fake-fast",
 		);
 		await userEvent.click(save);
@@ -177,30 +177,30 @@ describe("ProfilesPanel", () => {
 
 	it("duplicates and renames through a name form", async () => {
 		const { send } = panel();
-		await userEvent.click(within(item("deep")).getByRole("button", { name: "Duplicate" }));
-		expect(screen.getByRole("textbox", { name: "Name for the copy" })).toHaveValue("deep-copy");
-		await userEvent.click(screen.getByRole("button", { name: "Duplicate" }));
-		expect(send).toHaveBeenCalledWith({ type: "profile_duplicate", from: "deep", to: "deep-copy" });
+		await userEvent.click(within(item("deep")).getByRole("button", { name: "Duplicar" }));
+		expect(screen.getByRole("textbox", { name: "Nombre de la copia" })).toHaveValue("deep-copia");
+		await userEvent.click(screen.getByRole("button", { name: "Duplicar" }));
+		expect(send).toHaveBeenCalledWith({ type: "profile_duplicate", from: "deep", to: "deep-copia" });
 
-		await userEvent.click(within(item("deep")).getByRole("button", { name: "Rename" }));
-		const name = screen.getByRole("textbox", { name: "New name" });
+		await userEvent.click(within(item("deep")).getByRole("button", { name: "Renombrar" }));
+		const name = screen.getByRole("textbox", { name: "Nuevo nombre" });
 		await userEvent.clear(name);
 		await userEvent.type(name, "deeper");
-		await userEvent.click(screen.getByRole("button", { name: "Rename" }));
+		await userEvent.click(screen.getByRole("button", { name: "Renombrar" }));
 		expect(send).toHaveBeenLastCalledWith({ type: "profile_rename", from: "deep", to: "deeper" });
 	});
 
 	it("asks before deleting", async () => {
 		const { send } = panel();
-		await userEvent.click(within(item("deep")).getByRole("button", { name: "Delete" }));
-		const confirm = screen.getByRole("alertdialog", { name: "Delete profile" });
-		expect(confirm).toHaveTextContent("Delete “deep”? This cannot be undone.");
-		await userEvent.click(within(confirm).getByRole("button", { name: "Keep it" }));
+		await userEvent.click(within(item("deep")).getByRole("button", { name: "Eliminar" }));
+		const confirm = screen.getByRole("alertdialog", { name: "Eliminar perfil" });
+		expect(confirm).toHaveTextContent("¿Eliminar «deep»? Esto no se puede deshacer.");
+		await userEvent.click(within(confirm).getByRole("button", { name: "Conservarlo" }));
 		expect(send).not.toHaveBeenCalled();
-		await userEvent.click(within(item("deep")).getByRole("button", { name: "Delete" }));
+		await userEvent.click(within(item("deep")).getByRole("button", { name: "Eliminar" }));
 		await userEvent.click(
-			within(screen.getByRole("alertdialog", { name: "Delete profile" })).getByRole("button", {
-				name: "Delete",
+			within(screen.getByRole("alertdialog", { name: "Eliminar perfil" })).getByRole("button", {
+				name: "Eliminar",
 			}),
 		);
 		expect(send).toHaveBeenCalledWith({ type: "profile_delete", name: "deep" });
@@ -208,9 +208,12 @@ describe("ProfilesPanel", () => {
 
 	it("saves the current setup under a new name", async () => {
 		const { send } = panel();
-		await userEvent.click(screen.getByRole("button", { name: "Save my current setup" }));
-		await userEvent.type(screen.getByRole("textbox", { name: "Name for your current setup" }), "today");
-		await userEvent.click(screen.getByRole("button", { name: "Save" }));
+		await userEvent.click(screen.getByRole("button", { name: "Guardar mi configuración actual" }));
+		await userEvent.type(
+			screen.getByRole("textbox", { name: "Nombre para tu configuración actual" }),
+			"today",
+		);
+		await userEvent.click(screen.getByRole("button", { name: "Guardar" }));
 		expect(send).toHaveBeenCalledWith({ type: "profile_save_current", name: "today" });
 	});
 
@@ -225,25 +228,25 @@ describe("ProfilesPanel", () => {
 				missingProviders: ["Anthropic"],
 			}),
 		);
-		await userEvent.click(screen.getByRole("button", { name: "Import my Gentle Shell profiles" }));
+		await userEvent.click(screen.getByRole("button", { name: "Importar mis perfiles de Gentle Shell" }));
 		expect(send).toHaveBeenCalledWith({ type: "profile_import" });
 		const result = screen.getByRole("status");
-		expect(result).toHaveTextContent("Imported 2 profiles.");
-		expect(result).toHaveTextContent("Renamed because the name was taken: quick → quick-imported.");
-		expect(result).toHaveTextContent("Connect these accounts to use them: Anthropic.");
-		await userEvent.click(within(result).getByRole("button", { name: "Open accounts" }));
+		expect(result).toHaveTextContent("Se han importado 2 perfiles.");
+		expect(result).toHaveTextContent("Se ha cambiado el nombre porque ya existía: quick → quick-imported.");
+		expect(result).toHaveTextContent("Conecta estas cuentas para usarlas: Anthropic.");
+		await userEvent.click(within(result).getByRole("button", { name: "Abrir cuentas" }));
 		expect(send).toHaveBeenCalledWith({ type: "auth_list" });
 		expect(dispatch).toHaveBeenCalledWith({ type: "accounts", open: true });
 	});
 
 	it("hides import when there is nothing to import", () => {
 		panel(apply(base(), { ...profilesPayload, importable: false }));
-		expect(screen.queryByRole("button", { name: "Import my Gentle Shell profiles" })).toBeNull();
+		expect(screen.queryByRole("button", { name: "Importar mis perfiles de Gentle Shell" })).toBeNull();
 	});
 
 	it("closes", async () => {
 		const { dispatch } = panel();
-		await userEvent.click(screen.getByRole("button", { name: "Close profiles" }));
+		await userEvent.click(screen.getByRole("button", { name: "Cerrar perfiles" }));
 		expect(dispatch).toHaveBeenCalledWith({ type: "profiles", open: false });
 	});
 });
@@ -253,7 +256,7 @@ describe("ChatSurface profiles", () => {
 		const send = vi.fn();
 		const dispatch = vi.fn();
 		render(<ChatSurface variant="web" state={base()} send={send} dismiss={vi.fn()} dispatch={dispatch} />);
-		await userEvent.click(screen.getByRole("button", { name: "Profiles" }));
+		await userEvent.click(screen.getByRole("button", { name: "Perfiles" }));
 		expect(send).toHaveBeenCalledWith({ type: "profiles_list" });
 		expect(dispatch).toHaveBeenCalledWith({ type: "profiles", open: true });
 	});
@@ -264,7 +267,7 @@ describe("ChatSurface profiles", () => {
 			open: true,
 		});
 		render(<ChatSurface variant="web" state={state} send={vi.fn()} dismiss={vi.fn()} />);
-		expect(screen.getByRole("region", { name: "Profiles" })).toBeInTheDocument();
+		expect(screen.getByRole("region", { name: "Perfiles" })).toBeInTheDocument();
 		expect(screen.getByText("earlier question")).not.toBeVisible();
 	});
 });

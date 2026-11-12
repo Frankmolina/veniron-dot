@@ -163,9 +163,9 @@ fn panel_placement(places_windows: bool, full_screen: bool, rose_hidden: bool) -
 
 fn rose_menu_label(hidden: bool) -> &'static str {
     if hidden {
-        "Show the rose"
+        "Mostrar la máscara"
     } else {
-        "Hide the rose"
+        "Ocultar la máscara"
     }
 }
 
@@ -792,16 +792,16 @@ fn tray_menu_ids(conversations: bool, computer_control: bool) -> Vec<&'static st
 fn build_tray(app: &AppHandle, config: &DesktopConfig, rose_hidden: bool) -> tauri::Result<TrayIcon> {
     let autostart = app.autolaunch().is_enabled().unwrap_or(false);
     // The accelerator is only a label here; an unparsable one must not break the menu.
-    let open = MenuItem::with_id(app, "open", "Open", true, Some(config.shortcut.as_str()))
-        .or_else(|_| MenuItem::with_id(app, "open", "Open", true, None::<&str>))?;
+    let open = MenuItem::with_id(app, "open", "Abrir", true, Some(config.shortcut.as_str()))
+        .or_else(|_| MenuItem::with_id(app, "open", "Abrir", true, None::<&str>))?;
     app.manage(OpenMenuItem(open.clone()));
     let menu = Menu::new(app)?;
     let conversations = conversations_on(std::env::var("GENTLE_DOT_CONVERSATIONS").ok().as_deref());
     for id in tray_menu_ids(conversations, cfg!(any(target_os = "macos", windows))) {
         match id {
             "open" => menu.append(&open)?,
-            "new" => menu.append(&MenuItem::with_id(app, "new", "New conversation", true, None::<&str>)?)?,
-            "browser" => menu.append(&MenuItem::with_id(app, "browser", "Open in browser", true, None::<&str>)?)?,
+            "new" => menu.append(&MenuItem::with_id(app, "new", "Nueva conversación", true, None::<&str>)?)?,
+            "browser" => menu.append(&MenuItem::with_id(app, "browser", "Abrir en el navegador", true, None::<&str>)?)?,
             "rose" => {
                 let item = MenuItem::with_id(app, "rose", rose_menu_label(rose_hidden), true, None::<&str>)?;
                 menu.append(&item)?;
@@ -810,35 +810,35 @@ fn build_tray(app: &AppHandle, config: &DesktopConfig, rose_hidden: bool) -> tau
             "computer-stop" => menu.append(&MenuItem::with_id(
                 app,
                 "computer-stop",
-                "Stop computer control",
+                "Parar el control del ordenador",
                 true,
                 None::<&str>,
             )?)?,
             "computer-yolo" => {
                 // Off at launch: yolo mode never outlives the app (S24.9).
-                let item = CheckMenuItem::with_id(app, "computer-yolo", "Yolo mode", true, false, None::<&str>)?;
+                let item = CheckMenuItem::with_id(app, "computer-yolo", "Modo yolo", true, false, None::<&str>)?;
                 menu.append(&item)?;
                 app.manage(computer::YoloMenuItem(item));
             }
             "restart" => {
-                menu.append(&MenuItem::with_id(app, "restart", "Restart assistant", true, None::<&str>)?)?;
+                menu.append(&MenuItem::with_id(app, "restart", "Reiniciar el asistente", true, None::<&str>)?)?;
             }
             "autostart" => menu.append(&CheckMenuItem::with_id(
                 app,
                 "autostart",
-                "Launch at login",
+                "Abrir al iniciar sesión",
                 true,
                 autostart,
                 None::<&str>,
             )?)?,
-            "quit" => menu.append(&MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?)?,
+            "quit" => menu.append(&MenuItem::with_id(app, "quit", "Salir", true, None::<&str>)?)?,
             _ => menu.append(&PredefinedMenuItem::separator(app)?)?,
         }
     }
     TrayIconBuilder::with_id(TRAY)
         .icon(Image::from_bytes(TrayGlyph::Unavailable.image(Os::CURRENT))?)
         .icon_as_template(is_template(Os::CURRENT))
-        .tooltip("Gentle Dot")
+        .tooltip("VENIRON")
         .menu(&menu)
         .show_menu_on_left_click(true)
         .on_menu_event(move |app, event| {
@@ -884,10 +884,10 @@ fn show_message(app: &AppHandle, kind: MessageDialogKind, text: &str) {
     #[cfg(windows)]
     {
         let _ = app;
-        crate::alert::tell("Gentle Dot", text, matches!(kind, MessageDialogKind::Error));
+        crate::alert::tell("VENIRON", text, matches!(kind, MessageDialogKind::Error));
     }
     #[cfg(not(windows))]
-    app.dialog().message(text).title("Gentle Dot").kind(kind).show(|_| {});
+    app.dialog().message(text).title("VENIRON").kind(kind).show(|_| {});
 }
 
 fn open_in_browser(app: &AppHandle) -> CommandResult {
@@ -916,7 +916,7 @@ fn restart_daemon(app: AppHandle) {
             show_message(&app, MessageDialogKind::Warning, &daemon::foreign_daemon_message(port))
         }
         RestartOutcome::Failed(error) => {
-            show_message(&app, MessageDialogKind::Error, &format!("The assistant could not restart: {error}"))
+            show_message(&app, MessageDialogKind::Error, &format!("El asistente no ha podido reiniciarse: {error}"))
         }
     });
 }
@@ -1153,8 +1153,8 @@ mod tests {
 
     #[test]
     fn the_rose_item_offers_the_opposite_of_its_state() {
-        assert_eq!(rose_menu_label(false), "Hide the rose");
-        assert_eq!(rose_menu_label(true), "Show the rose");
+        assert_eq!(rose_menu_label(false), "Ocultar la máscara");
+        assert_eq!(rose_menu_label(true), "Mostrar la máscara");
     }
 
     #[test]

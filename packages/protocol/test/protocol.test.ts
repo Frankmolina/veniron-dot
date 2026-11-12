@@ -360,6 +360,6 @@ describe("app-only commands (S25.2)", () => {
 			expect(parsed, message.type).toBeDefined();
 			expect(parsed && isAppCommand(parsed), message.type).toBe(false);
 		}
-		expect(APP_REQUIRED).toBe("Open the Gentle Dot app to change connectors.");
+		expect(APP_REQUIRED).toBe("Abre la app VENIRON para cambiar los conectores.");
 	});
 });

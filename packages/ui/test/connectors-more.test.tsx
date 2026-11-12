@@ -183,9 +183,9 @@ describe("guided connectors", () => {
 		const send = vi.fn();
 		render(<Harness initial={reduce(ready, { type: "connectors", open: true })} send={send} />);
 		const user = userEvent.setup();
-		await user.click(screen.getByRole("button", { name: "Connect Slack" }));
+		await user.click(screen.getByRole("button", { name: "Conectar Slack" }));
 		expect(send).not.toHaveBeenCalledWith({ type: "connector_connect", connectorId: "slack" });
-		const guide = within(screen.getByRole("region", { name: "Set up Slack" }));
+		const guide = within(screen.getByRole("region", { name: "Configurar Slack" }));
 		expect(guide.getAllByRole("listitem").map((li) => li.textContent)).toEqual([
 			"Create an app.",
 			"Turn on PKCE.",
@@ -193,11 +193,11 @@ describe("guided connectors", () => {
 			"Copy the client ID.",
 		]);
 		expect(guide.getByText("http://localhost:38417/callback")).toBeInTheDocument();
-		expect(guide.getByRole("button", { name: "Open Slack apps" })).toBeInTheDocument();
-		await user.click(guide.getByRole("button", { name: "Back" }));
-		expect(screen.queryByRole("region", { name: "Set up Slack" })).toBeNull();
-		await user.click(screen.getByRole("button", { name: "Connect Discord" }));
-		await user.click(screen.getByRole("button", { name: "Continue" }));
+		expect(guide.getByRole("button", { name: "Abrir Slack apps" })).toBeInTheDocument();
+		await user.click(guide.getByRole("button", { name: "Atrás" }));
+		expect(screen.queryByRole("region", { name: "Configurar Slack" })).toBeNull();
+		await user.click(screen.getByRole("button", { name: "Conectar Discord" }));
+		await user.click(screen.getByRole("button", { name: "Continuar" }));
 		expect(send).toHaveBeenCalledWith({ type: "connector_connect", connectorId: "discord" });
 	});
 
@@ -213,21 +213,21 @@ describe("guided connectors", () => {
 			},
 		});
 		const { send } = panel(s);
-		expect(screen.getByText("Setting up Slack")).toBeInTheDocument();
+		expect(screen.getByText("Configurando Slack")).toBeInTheDocument();
 		expect(screen.getByLabelText(/Client secret/)).toHaveAttribute("type", "password");
-		await userEvent.setup().click(screen.getByRole("button", { name: "Skip" }));
+		await userEvent.setup().click(screen.getByRole("button", { name: "Omitir" }));
 		expect(send).toHaveBeenCalledWith({ type: "auth_reply", flowId: "connector-setup-1", value: "" });
 	});
 
-	it("shows where a custom connector came from, that its tools are hidden, and offers Set up", async () => {
+	it("shows where a custom connector came from, that its tools are hidden, and offers Preparar", async () => {
 		const { send, dispatch } = panel(reduce(ready, { type: "connectors", open: true }));
 		const row = within(screen.getByRole("listitem", { name: "GitHub" }));
 		expect(row.getByText("Imported from Cursor")).toBeInTheDocument();
 		expect(row.getByText("npx -y @modelcontextprotocol/server-github")).toBeInTheDocument();
-		expect(row.getByText(/tools stay hidden until you choose Read and send/)).toBeInTheDocument();
+		expect(row.getByText(/herramientas siguen ocultas hasta que elijas Leer y enviar/)).toBeInTheDocument();
 		const waiting = within(screen.getByRole("listitem", { name: "perplexity" }));
-		expect(waiting.getByText("Needs setup")).toBeInTheDocument();
-		await userEvent.setup().click(waiting.getByRole("button", { name: "Set up perplexity" }));
+		expect(waiting.getByText("Necesita configuración")).toBeInTheDocument();
+		await userEvent.setup().click(waiting.getByRole("button", { name: "Configurar perplexity" }));
 		expect(send).toHaveBeenCalledWith({ type: "connector_setup", connectorId: "perplexity" });
 		expect(dispatch).toHaveBeenCalledWith({ type: "connector_started", connectorId: "perplexity" });
 	});
@@ -238,32 +238,32 @@ describe("adding another connector", () => {
 		const send = vi.fn();
 		render(<Harness initial={reduce(ready, { type: "connectors", open: true })} send={send} />);
 		const user = userEvent.setup();
-		await user.click(screen.getByRole("button", { name: "Add another connector" }));
-		await user.type(screen.getByLabelText("What do you want to connect?"), "Jira Cloud");
-		await user.click(screen.getByRole("button", { name: "Ask the assistant" }));
+		await user.click(screen.getByRole("button", { name: "Añadir otro conector" }));
+		await user.type(screen.getByLabelText("¿Qué quieres conectar?"), "Jira Cloud");
+		await user.click(screen.getByRole("button", { name: "Preguntar al asistente" }));
 		const message = send.mock.calls.map(([m]) => m as ClientMessage).find((m) => m.type === "send");
 		expect(message).toMatchObject({ type: "send", text: expect.stringContaining("Jira Cloud") });
-		expect(screen.queryByRole("region", { name: "Connectors" })).toBeNull();
+		expect(screen.queryByRole("region", { name: "Conectores" })).toBeNull();
 	});
 
 	it("shows the assistant's draft as a card with every detail; approving opens its setup", async () => {
 		const send = vi.fn();
 		render(<Harness initial={apply(ready, { type: "connector_draft", draft })} send={send} />);
-		const card = within(screen.getByRole("region", { name: "Add GitHub?" }));
+		const card = within(screen.getByRole("region", { name: "¿Añadir GitHub?" }));
 		expect(card.getByText("Read issues and pull requests.")).toBeInTheDocument();
 		expect(card.getByText("npx -y @modelcontextprotocol/server-github@2025.4.8")).toBeInTheDocument();
 		expect(card.getByText("GITHUB_PERSONAL_ACCESS_TOKEN")).toBeInTheDocument();
-		expect(card.getByText(/You type each secret in the app/)).toBeInTheDocument();
+		expect(card.getByText(/Escribes cada secreto en la aplicación/)).toBeInTheDocument();
 		const user = userEvent.setup();
-		await user.click(card.getByRole("button", { name: "Add GitHub" }));
+		await user.click(card.getByRole("button", { name: "Añadir GitHub" }));
 		expect(send).toHaveBeenCalledWith({ type: "connector_draft_reply", draftId: "d1", approve: true });
-		expect(screen.getByRole("region", { name: "Connectors" })).toBeInTheDocument();
+		expect(screen.getByRole("region", { name: "Conectores" })).toBeInTheDocument();
 	});
 
 	it("declines a draft, and drops the card when it is resolved anywhere", async () => {
 		const send = vi.fn();
 		render(<Harness initial={apply(ready, { type: "connector_draft", draft })} send={send} />);
-		await userEvent.setup().click(screen.getByRole("button", { name: "Decline" }));
+		await userEvent.setup().click(screen.getByRole("button", { name: "Rechazar" }));
 		expect(send).toHaveBeenCalledWith({ type: "connector_draft_reply", draftId: "d1", approve: false });
 		const s = apply(
 			ready,
@@ -295,7 +295,7 @@ describe("importing MCP servers", () => {
 		const send = vi.fn();
 		render(<Harness initial={reduce(ready, { type: "connectors", open: true })} send={send} />);
 		const user = userEvent.setup();
-		await user.click(screen.getByRole("button", { name: "Import my MCP servers" }));
+		await user.click(screen.getByRole("button", { name: "Importar mis servidores MCP" }));
 		expect(send).toHaveBeenCalledWith({ type: "connectors_scan" });
 	});
 
@@ -303,23 +303,23 @@ describe("importing MCP servers", () => {
 		const { send } = panel(
 			apply(reduce(ready, { type: "connectors", open: true }), { type: "connector_imports", found }),
 		);
-		const list = within(screen.getByRole("region", { name: "Found these servers" }));
+		const list = within(screen.getByRole("region", { name: "Servidores encontrados" }));
 		const stripe = list.getByRole("checkbox", { name: "stripe" });
 		const githubBox = list.getByRole("checkbox", { name: "github" });
 		expect(stripe).not.toBeChecked();
-		expect(list.getByText("From Claude Desktop, Cursor")).toBeInTheDocument();
+		expect(list.getByText("De Claude Desktop, Cursor")).toBeInTheDocument();
 		expect(list.getByText("GITHUB_PERSONAL_ACCESS_TOKEN")).toBeInTheDocument();
 		expect(list.getByText("Authorization")).toBeInTheDocument();
 		expect(list.getByRole("checkbox", { name: "legacy" })).toBeDisabled();
 		expect(list.getByText(/old SSE transport/)).toBeInTheDocument();
 		expect(list.getByRole("checkbox", { name: "linear" })).toBeDisabled();
-		expect(list.getByText(/Already in your connectors as linear/)).toBeInTheDocument();
+		expect(list.getByText(/Ya está en tus conectores como linear/)).toBeInTheDocument();
 		const user = userEvent.setup();
 		const importButton = list.getByRole("button", { name: /Import/ });
 		expect(importButton).toBeDisabled();
 		await user.click(stripe);
 		await user.click(githubBox);
-		await user.click(list.getByRole("button", { name: "Import 2 servers" }));
+		await user.click(list.getByRole("button", { name: "Importar 2 servidores" }));
 		expect(send).toHaveBeenCalledWith({
 			type: "connector_import",
 			ids: ["Cursor:stripe", "Claude Desktop:github"],
@@ -345,7 +345,7 @@ describe("importing MCP servers", () => {
 		panel(
 			apply(reduce(ready, { type: "connectors", open: true }), { type: "connector_imports", found: [vault] }),
 		);
-		const list = within(screen.getByRole("region", { name: "Found these servers" }));
+		const list = within(screen.getByRole("region", { name: "Servidores encontrados" }));
 		expect(
 			list.getByText("VAULT_TOKEN: Runs a command on your computer to get this value."),
 		).toBeInTheDocument();
@@ -359,7 +359,7 @@ describe("importing MCP servers", () => {
 		});
 		expect(s.connectors.imports).toEqual([]);
 		panel(s);
-		expect(screen.getByText(/No MCP servers were found/)).toBeInTheDocument();
+		expect(screen.getByText(/No se han encontrado servidores MCP/)).toBeInTheDocument();
 		s = apply(s, { type: "connector_imports", found }, { type: "connector_imported", names: ["stripe"] });
 		expect(s.connectors.imports).toBeUndefined();
 		expect(s.notices.at(-1)?.message).toMatch(/Imported stripe/);
@@ -370,10 +370,10 @@ describe("drafts and imports outside the desktop app (S25.2)", () => {
 	it("a draft can be declined on the web page but only added in the app", async () => {
 		const send = vi.fn();
 		render(<WebHarness initial={apply(ready, { type: "connector_draft", draft })} send={send} />);
-		const card = within(screen.getByRole("region", { name: "Add GitHub?" }));
-		expect(card.getByRole("button", { name: "Add GitHub" })).toBeDisabled();
+		const card = within(screen.getByRole("region", { name: "¿Añadir GitHub?" }));
+		expect(card.getByRole("button", { name: "Añadir GitHub" })).toBeDisabled();
 		expect(card.getByText(APP_REQUIRED)).toBeInTheDocument();
-		await userEvent.setup().click(card.getByRole("button", { name: "Decline" }));
+		await userEvent.setup().click(card.getByRole("button", { name: "Rechazar" }));
 		expect(send.mock.calls.map(([m]) => m)).toEqual([
 			{ type: "connector_draft_reply", draftId: "d1", approve: false },
 		]);
@@ -390,7 +390,7 @@ describe("drafts and imports outside the desktop app (S25.2)", () => {
 				send={send}
 			/>,
 		);
-		const list = within(screen.getByRole("region", { name: "Found these servers" }));
+		const list = within(screen.getByRole("region", { name: "Servidores encontrados" }));
 		await userEvent.setup().click(list.getByRole("checkbox", { name: "stripe" }));
 		expect(list.getByRole("button", { name: /Import/ })).toBeDisabled();
 		expect(send).not.toHaveBeenCalledWith(expect.objectContaining({ type: "connector_import" }));

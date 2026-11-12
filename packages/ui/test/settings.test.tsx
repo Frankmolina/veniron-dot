@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { formatShortcut, recordKey } from "../src/shortcut.ts";
 import { type DotState, initialState } from "../src/store.ts";
 
-/** The Settings screen and its keyboard shortcut (S33), through the panel and mocked Tauri commands. */
+/** The Ajustes screen and its keyboard shortcut (S33), through the panel and mocked Tauri commands. */
 const h = vi.hoisted(() => ({
 	tauri: true,
 	shortcut: "Alt+Space",
@@ -45,17 +45,17 @@ async function renderApp(search: string) {
 
 const invoked = (command: string) => h.invoke.mock.calls.filter(([c]) => c === command);
 
-async function openSettings() {
+async function openAjustes() {
 	await renderApp("?surface=panel");
-	await userEvent.click(await screen.findByRole("button", { name: "Settings" }));
-	return screen.findByRole("region", { name: "Settings" });
+	await userEvent.click(await screen.findByRole("button", { name: "Ajustes" }));
+	return screen.findByRole("region", { name: "Ajustes" });
 }
 
 async function startRecording() {
-	await openSettings();
+	await openAjustes();
 	await screen.findByText("⌥ Space");
-	await userEvent.click(screen.getByRole("button", { name: "Change" }));
-	await screen.findByText(/Press the new shortcut/);
+	await userEvent.click(screen.getByRole("button", { name: "Cambiar" }));
+	await screen.findByText(/Pulsa el nuevo atajo/);
 }
 
 beforeEach(() => {
@@ -152,7 +152,7 @@ describe("recording a key combination", () => {
 describe("when the app cannot reach its assistant (S35.2)", () => {
 	it("the panel shows the app's own reason, not the browser's access-key note", async () => {
 		const reason =
-			"Another Gentle Dot assistant is already running on port 4317. Stop it, then choose Restart assistant.";
+			"Another Gentle Dot assistant is already running on port 4317. Detener it, then choose Restart assistant.";
 		const fallback = h.invoke.getMockImplementation();
 		h.invoke = vi.fn(async (command: string, args?: Record<string, unknown>) => {
 			if (command === "connection_info") throw reason;
@@ -170,41 +170,41 @@ describe("when the web page has no access key", () => {
 		await renderApp("?surface=web");
 		const status = await screen.findByRole("status");
 		expect(status).toHaveTextContent(
-			"This page needs your access key. On your computer, open it from the Gentle Dot menu (Open in browser); on a server, open the link with #token=<your access key>.",
+			"Esta página necesita tu clave de acceso. En tu ordenador, ábrela desde el menú de VENIRON (Abrir en el navegador); en un servidor, abre el enlace con #token=<tu clave de acceso>.",
 		);
 	});
 });
 
-describe("the Settings screen (S33.1)", () => {
+describe("the Ajustes screen (S33.1)", () => {
 	it("opens from a gear in the desktop panel header", async () => {
-		const settings = await openSettings();
-		expect(settings).toHaveTextContent("Keyboard shortcut");
+		const settings = await openAjustes();
+		expect(settings).toHaveTextContent("Atajo de teclado");
 		expect(await screen.findByText("⌥ Space")).toBeInTheDocument();
-		await userEvent.click(screen.getByRole("button", { name: "Close settings" }));
-		expect(screen.queryByRole("region", { name: "Settings" })).toBeNull();
+		await userEvent.click(screen.getByRole("button", { name: "Cerrar ajustes" }));
+		expect(screen.queryByRole("region", { name: "Ajustes" })).toBeNull();
 	});
 
 	it("the web UI shows no gear", async () => {
 		h.tauri = false;
 		await renderApp("?surface=web#token=abc");
-		await screen.findByRole("button", { name: "Accounts" });
-		expect(screen.queryByRole("button", { name: "Settings" })).toBeNull();
+		await screen.findByRole("button", { name: "Cuentas" });
+		expect(screen.queryByRole("button", { name: "Ajustes" })).toBeNull();
 		expect(invoked("shortcut_get")).toHaveLength(0);
 	});
 
 	it("shows key names off macOS", async () => {
 		vi.spyOn(navigator, "userAgent", "get").mockReturnValue(LINUX_AGENT);
 		h.shortcut = "Shift+Super+K";
-		await openSettings();
+		await openAjustes();
 		expect(await screen.findByText("Shift+Super+K")).toBeInTheDocument();
 	});
 });
 
-describe("the Private memory toggle (SW9)", () => {
+describe("the Memoria privada toggle (SW9)", () => {
 	it("shows the stored value and flips it through the app", async () => {
 		h.memory = "private";
-		await openSettings();
-		const toggle = await screen.findByRole("switch", { name: "Private memory" });
+		await openAjustes();
+		const toggle = await screen.findByRole("switch", { name: "Memoria privada" });
 		await waitFor(() => expect(toggle).toBeEnabled());
 		expect(toggle).toBeChecked();
 		expect(invoked("memory_set")).toHaveLength(0);
@@ -215,8 +215,8 @@ describe("the Private memory toggle (SW9)", () => {
 	});
 
 	it("defaults to the shared Engram and turns private memory on", async () => {
-		await openSettings();
-		const toggle = await screen.findByRole("switch", { name: "Private memory" });
+		await openAjustes();
+		const toggle = await screen.findByRole("switch", { name: "Memoria privada" });
 		await waitFor(() => expect(toggle).toBeEnabled());
 		expect(toggle).not.toBeChecked();
 		await userEvent.click(toggle);
@@ -231,32 +231,32 @@ describe("an invalid memory setting (S9)", () => {
 
 	it("shows the error and never presents the setting as shared", async () => {
 		h.memoryError = ERROR;
-		await openSettings();
+		await openAjustes();
 		const alert = await screen.findByText(new RegExp(ERROR));
 		expect(alert).toHaveAttribute("role", "alert");
-		expect(alert).toHaveTextContent(/"shared" or "private"/);
+		expect(alert).toHaveTextContent(/"shared" o "private"/);
 		// No switch to read as "Shared": the user picks a valid value explicitly.
-		expect(screen.queryByRole("switch", { name: "Private memory" })).toBeNull();
+		expect(screen.queryByRole("switch", { name: "Memoria privada" })).toBeNull();
 		expect(invoked("memory_set")).toHaveLength(0);
 	});
 
 	it("repairs the value with either choice and goes back to the switch", async () => {
 		h.memoryError = ERROR;
-		await openSettings();
-		await userEvent.click(await screen.findByRole("button", { name: "Use private memory" }));
+		await openAjustes();
+		await userEvent.click(await screen.findByRole("button", { name: "Usar memoria privada" }));
 		await waitFor(() => expect(invoked("memory_set")).toHaveLength(1));
 		expect(invoked("memory_set")[0]?.[1]).toEqual({ memory: "private" });
-		const toggle = await screen.findByRole("switch", { name: "Private memory" });
+		const toggle = await screen.findByRole("switch", { name: "Memoria privada" });
 		expect(toggle).toBeChecked();
 		expect(screen.queryByText(new RegExp(ERROR))).toBeNull();
 	});
 
 	it("offers shared memory too", async () => {
 		h.memoryError = ERROR;
-		await openSettings();
-		await userEvent.click(await screen.findByRole("button", { name: "Use shared memory" }));
+		await openAjustes();
+		await userEvent.click(await screen.findByRole("button", { name: "Usar memoria compartida" }));
 		await waitFor(() => expect(invoked("memory_set")[0]?.[1]).toEqual({ memory: "shared" }));
-		expect(await screen.findByRole("switch", { name: "Private memory" })).not.toBeChecked();
+		expect(await screen.findByRole("switch", { name: "Memoria privada" })).not.toBeChecked();
 	});
 
 	it("keeps the error when saving fails", async () => {
@@ -266,23 +266,23 @@ describe("an invalid memory setting (S9)", () => {
 			if (command === "memory_set") throw "Gentle Dot cannot save config.json (denied).";
 			return base(command, args);
 		});
-		await openSettings();
-		await userEvent.click(await screen.findByRole("button", { name: "Use shared memory" }));
+		await openAjustes();
+		await userEvent.click(await screen.findByRole("button", { name: "Usar memoria compartida" }));
 		expect(await screen.findByText("Gentle Dot cannot save config.json (denied).")).toBeInTheDocument();
 		expect(screen.getByText(new RegExp(ERROR))).toBeInTheDocument();
-		expect(screen.queryByRole("switch", { name: "Private memory" })).toBeNull();
+		expect(screen.queryByRole("switch", { name: "Memoria privada" })).toBeNull();
 	});
 });
 
 describe("voice language (S30.6)", () => {
 	it("does not offer macOS voice language on Windows", async () => {
 		vi.spyOn(navigator, "userAgent", "get").mockReturnValue("Windows NT 10.0");
-		await openSettings();
-		expect(screen.queryByRole("combobox", { name: "Voice language" })).toBeNull();
+		await openAjustes();
+		expect(screen.queryByRole("combobox", { name: "Idioma de la voz" })).toBeNull();
 	});
 	it("defaults to the system language and remembers the one chosen for macOS speech", async () => {
-		await openSettings();
-		const picker = screen.getByRole("combobox", { name: "Voice language" });
+		await openAjustes();
+		const picker = screen.getByRole("combobox", { name: "Idioma de la voz" });
 		expect(picker).toHaveValue("");
 		await userEvent.selectOptions(picker, "es-ES");
 		expect(localStorage.getItem("gentle-dot-voice-language")).toBe("es-ES");
@@ -298,7 +298,7 @@ describe("changing the shortcut (S33.2, S33.3)", () => {
 		await waitFor(() => expect(invoked("shortcut_set")).toHaveLength(1));
 		expect(invoked("shortcut_set")[0]?.[1]).toEqual({ shortcut: "Ctrl+Alt+K" });
 		expect(await screen.findByText("⌃⌥K")).toBeInTheDocument();
-		expect(screen.getByRole("status")).toHaveTextContent("Saved. It works right away.");
+		expect(screen.getByRole("status")).toHaveTextContent("Guardado. Ya funciona.");
 	});
 
 	it("shows that the change is pending until the app answers", async () => {
@@ -306,15 +306,15 @@ describe("changing the shortcut (S33.2, S33.3)", () => {
 		h.setResult = () => new Promise((resolve) => (answer = resolve));
 		await startRecording();
 		fireEvent.keyDown(window, { key: "k", code: "KeyK", metaKey: true, shiftKey: true });
-		expect(await screen.findByRole("status")).toHaveTextContent("Applying ⇧⌘K…");
+		expect(await screen.findByRole("status")).toHaveTextContent("Aplicando ⇧⌘K…");
 		await act(async () => answer({ shortcut: "Shift+Super+K" }));
-		expect(screen.getByRole("status")).toHaveTextContent("Saved. It works right away.");
+		expect(screen.getByRole("status")).toHaveTextContent("Guardado. Ya funciona.");
 	});
 
 	it("Esc cancels recording without hiding the panel", async () => {
 		await startRecording();
 		fireEvent.keyDown(window, { key: "Escape", code: "Escape" });
-		await waitFor(() => expect(screen.queryByText(/Press the new shortcut/)).toBeNull());
+		await waitFor(() => expect(screen.queryByText(/Pulsa el nuevo atajo/)).toBeNull());
 		expect(invoked("hide_panel")).toHaveLength(0);
 		expect(invoked("shortcut_set")).toHaveLength(0);
 		expect(screen.getByText("⌥ Space")).toBeInTheDocument();
@@ -334,7 +334,7 @@ describe("changing the shortcut (S33.2, S33.3)", () => {
 	it("keeps recording while only modifiers are held", async () => {
 		await startRecording();
 		fireEvent.keyDown(window, { key: "Alt", code: "AltLeft", altKey: true });
-		expect(screen.getByText(/Press the new shortcut/)).toBeInTheDocument();
+		expect(screen.getByText(/Pulsa el nuevo atajo/)).toBeInTheDocument();
 		expect(invoked("shortcut_set")).toHaveLength(0);
 	});
 
@@ -352,12 +352,12 @@ describe("changing the shortcut (S33.2, S33.3)", () => {
 
 	it("resets to the default shortcut", async () => {
 		h.shortcut = "Shift+Super+K";
-		await openSettings();
+		await openAjustes();
 		await screen.findByText("⇧⌘K");
-		await userEvent.click(screen.getByRole("button", { name: "Reset to default" }));
+		await userEvent.click(screen.getByRole("button", { name: "Restablecer el predeterminado" }));
 		await waitFor(() => expect(invoked("shortcut_set")).toHaveLength(1));
 		expect(invoked("shortcut_set")[0]?.[1]).toEqual({ shortcut: "Alt+Space" });
 		expect(await screen.findByText("⌥ Space")).toBeInTheDocument();
-		expect(screen.getByRole("button", { name: "Reset to default" })).toBeDisabled();
+		expect(screen.getByRole("button", { name: "Restablecer el predeterminado" })).toBeDisabled();
 	});
 });

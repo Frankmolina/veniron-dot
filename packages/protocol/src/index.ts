@@ -484,7 +484,7 @@ export type ServerPayload =
 	| { type: "voice_unavailable"; requestId: string; reason: string };
 
 /** Why a window cannot change connectors itself (S25.2). */
-export const APP_REQUIRED = "Open the Gentle Dot app to change connectors.";
+export const APP_REQUIRED = "Abre la app VENIRON para cambiar los conectores.";
 
 /**
  * Messages only the desktop app that launched the daemon may send, over its private channel

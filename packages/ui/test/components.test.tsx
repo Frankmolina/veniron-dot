@@ -16,7 +16,7 @@ describe("Composer", () => {
 	it("sends on Enter and keeps a new line on Shift+Enter", async () => {
 		const send = vi.fn<(message: ClientMessage) => void>();
 		render(<Composer busy={false} disabled={false} send={send} />);
-		const box = screen.getByRole("textbox", { name: "Message" });
+		const box = screen.getByRole("textbox", { name: "Mensaje" });
 		await userEvent.type(box, "first line{Shift>}{Enter}{/Shift}second{Enter}");
 		expect(send).toHaveBeenCalledTimes(1);
 		const sent = send.mock.calls[0]?.[0];
@@ -28,14 +28,14 @@ describe("Composer", () => {
 	it("does not send blank text", async () => {
 		const send = vi.fn();
 		render(<Composer busy={false} disabled={false} send={send} />);
-		await userEvent.type(screen.getByRole("textbox", { name: "Message" }), "   {Enter}");
+		await userEvent.type(screen.getByRole("textbox", { name: "Mensaje" }), "   {Enter}");
 		expect(send).not.toHaveBeenCalled();
 	});
 
-	it("offers Stop while the assistant works", async () => {
+	it("offers Detener while the assistant works", async () => {
 		const send = vi.fn();
 		render(<Composer busy disabled={false} send={send} />);
-		await userEvent.click(screen.getByRole("button", { name: "Stop" }));
+		await userEvent.click(screen.getByRole("button", { name: "Detener" }));
 		expect(send).toHaveBeenCalledWith({ type: "abort" });
 	});
 });
@@ -71,11 +71,11 @@ describe("AskCard", () => {
 		const message = `The assistant wants to create pages in Notion.\n\nbody: ${"z".repeat(7900)}`;
 		render(
 			<AskCard
-				ask={{ requestId: "q4", method: "confirm", title: "Allow Notion to create pages?", message }}
+				ask={{ requestId: "q4", method: "confirm", title: "Permitir Notion to create pages?", message }}
 				send={vi.fn()}
 			/>,
 		);
-		const preview = screen.getByRole("region", { name: "Details" });
+		const preview = screen.getByRole("region", { name: "Detalles" });
 		expect(preview).toHaveClass("ask-message");
 		expect(preview.textContent).toBe(message);
 		// Keyboard users can scroll it too.
@@ -91,9 +91,9 @@ describe("AskCard", () => {
 			/>,
 		);
 		await userEvent.type(screen.getByPlaceholderText("Name"), "Ada");
-		await userEvent.click(screen.getByRole("button", { name: "Send answer" }));
+		await userEvent.click(screen.getByRole("button", { name: "Enviar respuesta" }));
 		expect(send).toHaveBeenCalledWith({ type: "ui_response", requestId: "q3", value: "Ada" });
-		await userEvent.click(screen.getByRole("button", { name: "Skip" }));
+		await userEvent.click(screen.getByRole("button", { name: "Omitir" }));
 		expect(send).toHaveBeenLastCalledWith({ type: "ui_response", requestId: "q3", cancelled: true });
 	});
 });
@@ -119,7 +119,7 @@ describe("MessageList", () => {
 			/>,
 		);
 		expect(screen.getByText("good").tagName).toBe("STRONG");
-		const summary = screen.getByRole("button", { name: /Read 2 files · Ran 1 command/ });
+		const summary = screen.getByRole("button", { name: /Leyó 2 archivos · Ejecutó 1 comando/ });
 		await userEvent.click(summary);
 		expect(screen.getByText("Read b.md")).toBeInTheDocument();
 		expect(screen.getByText("A command failed")).toBeInTheDocument();
@@ -167,10 +167,10 @@ describe("ChatSurface", () => {
 	it("shows the interruption prompt and continues", async () => {
 		const send = vi.fn();
 		render(<ChatSurface variant="web" state={state({ interrupted: true })} send={send} dismiss={vi.fn()} />);
-		expect(screen.getByText("I was interrupted. Continue?")).toBeInTheDocument();
-		await userEvent.click(screen.getByRole("button", { name: "Continue" }));
+		expect(screen.getByText("Me han interrumpido. ¿Continúo?")).toBeInTheDocument();
+		await userEvent.click(screen.getByRole("button", { name: "Continuar" }));
 		expect(send).toHaveBeenCalledWith(
-			expect.objectContaining({ type: "send", text: "Continue where you left off." }),
+			expect.objectContaining({ type: "send", text: "Continúa por donde lo dejaste." }),
 		);
 	});
 
@@ -192,9 +192,9 @@ describe("ChatSurface", () => {
 			/>,
 		);
 		expect(screen.getByRole("heading", { name: "Current" })).toBeInTheDocument();
-		await userEvent.click(screen.getByRole("button", { name: "New conversation" }));
+		await userEvent.click(screen.getByRole("button", { name: "Nueva conversación" }));
 		expect(send).toHaveBeenCalledWith({ type: "new_conversation" });
-		await userEvent.click(screen.getByRole("button", { name: "Conversations" }));
+		await userEvent.click(screen.getByRole("button", { name: "Conversaciones" }));
 		await userEvent.click(screen.getByRole("button", { name: /Trip plan/ }));
 		expect(send).toHaveBeenCalledWith({ type: "open_conversation", conversationId: "a.jsonl" });
 	});
@@ -203,7 +203,7 @@ describe("ChatSurface", () => {
 		const { rerender } = render(
 			<ChatSurface variant="web" state={state({ connection: "closed" })} send={vi.fn()} dismiss={vi.fn()} />,
 		);
-		expect(screen.getByRole("status")).toHaveTextContent("Reconnecting");
+		expect(screen.getByRole("status")).toHaveTextContent("Reconectando");
 		rerender(
 			<ChatSurface
 				variant="web"
@@ -212,7 +212,7 @@ describe("ChatSurface", () => {
 				dismiss={vi.fn()}
 			/>,
 		);
-		expect(screen.getByRole("status")).toHaveTextContent("Open the page again from the Gentle Dot menu");
+		expect(screen.getByRole("status")).toHaveTextContent("Vuelve a abrir la página desde el menú de VENIRON");
 	});
 
 	it("shows notices that can be dismissed", () => {
@@ -225,7 +225,7 @@ describe("ChatSurface", () => {
 				dismiss={dismiss}
 			/>,
 		);
-		fireEvent.click(screen.getByRole("button", { name: "Dismiss" }));
+		fireEvent.click(screen.getByRole("button", { name: "Descartar" }));
 		expect(dismiss).toHaveBeenCalledWith(7);
 	});
 });

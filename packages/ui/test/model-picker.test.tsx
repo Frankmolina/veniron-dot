@@ -47,22 +47,22 @@ function Harness({ initial, send }: { initial: DotState; send: (m: ClientMessage
 
 async function openPicker(send = vi.fn(), initial = ready) {
 	render(<Harness initial={initial} send={send} />);
-	await userEvent.click(screen.getByRole("button", { name: "Model: GPT-5" }));
+	await userEvent.click(screen.getByRole("button", { name: "Modelo: GPT-5" }));
 	dispatchServer(models);
-	return { send, dialog: screen.getByRole("dialog", { name: "Choose a model" }) };
+	return { send, dialog: screen.getByRole("dialog", { name: "Elegir un modelo" }) };
 }
 
-const list = () => screen.getByRole("listbox", { name: "Models" });
+const list = () => screen.getByRole("listbox", { name: "Modelos" });
 const option = (name: string) => within(list()).getByRole("option", { name: new RegExp(`^${name}`) });
 
 describe("model picker (S32)", () => {
 	it("shows the current model in a compact chip and opens a list grouped by account, with profiles", async () => {
 		const { send, dialog } = await openPicker();
 		expect(send).toHaveBeenCalledWith({ type: "models_list" });
-		expect(screen.getByRole("button", { name: "Model: GPT-5" })).toHaveAttribute("aria-expanded", "true");
-		expect(within(dialog).getByRole("searchbox", { name: "Search models" })).toHaveFocus();
+		expect(screen.getByRole("button", { name: "Modelo: GPT-5" })).toHaveAttribute("aria-expanded", "true");
+		expect(within(dialog).getByRole("searchbox", { name: "Buscar modelos" })).toHaveFocus();
 		const groups = within(dialog).getAllByRole("group");
-		expect(groups.map((g) => g.getAttribute("aria-label"))).toEqual(["OpenAI", "NaN", "Profiles"]);
+		expect(groups.map((g) => g.getAttribute("aria-label"))).toEqual(["OpenAI", "NaN", "Perfiles"]);
 		expect(within(groups[0] as HTMLElement).getAllByRole("option")).toHaveLength(2);
 		expect(within(groups[2] as HTMLElement).getByRole("option", { name: /daily/ })).toBeInTheDocument();
 		expect(option("GPT-5")).toHaveAttribute("aria-current", "true");
@@ -70,16 +70,16 @@ describe("model picker (S32)", () => {
 
 	it("filters by model or account name as the user types", async () => {
 		await openPicker();
-		await userEvent.type(screen.getByRole("searchbox", { name: "Search models" }), "nan");
+		await userEvent.type(screen.getByRole("searchbox", { name: "Buscar modelos" }), "nan");
 		expect(
 			within(list())
 				.getAllByRole("option")
 				.map((o) => o.textContent),
 		).toEqual([expect.stringContaining("NaN Big")]);
-		await userEvent.clear(screen.getByRole("searchbox", { name: "Search models" }));
-		await userEvent.type(screen.getByRole("searchbox", { name: "Search models" }), "zzz");
+		await userEvent.clear(screen.getByRole("searchbox", { name: "Buscar modelos" }));
+		await userEvent.type(screen.getByRole("searchbox", { name: "Buscar modelos" }), "zzz");
 		expect(within(list()).queryAllByRole("option")).toEqual([]);
-		expect(screen.getByText("No models match.")).toBeInTheDocument();
+		expect(screen.getByText("Ningún modelo coincide.")).toBeInTheDocument();
 	});
 
 	it("selects a model by click, keeping the thinking level when the new model supports it", async () => {
@@ -96,7 +96,7 @@ describe("model picker (S32)", () => {
 
 	it("moves with the arrow keys and selects with Enter", async () => {
 		const { send } = await openPicker();
-		const search = screen.getByRole("searchbox", { name: "Search models" });
+		const search = screen.getByRole("searchbox", { name: "Buscar modelos" });
 		// The highlight starts on the current model.
 		expect(search).toHaveAttribute("aria-activedescendant", option("GPT-5").id);
 		await userEvent.keyboard("{ArrowDown}");
@@ -129,17 +129,17 @@ describe("model picker (S32)", () => {
 		window.removeEventListener("keydown", onKey);
 		expect(seen).toEqual([true]);
 		expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-		expect(screen.getByRole("button", { name: "Model: GPT-5" })).toHaveFocus();
+		expect(screen.getByRole("button", { name: "Modelo: GPT-5" })).toHaveFocus();
 	});
 
 	it("shows the thinking level only when the current model supports it", async () => {
 		const { send } = await openPicker();
-		const thinking = screen.getByRole("combobox", { name: "Thinking" });
+		const thinking = screen.getByRole("combobox", { name: "Razonamiento" });
 		expect(
 			within(thinking)
 				.getAllByRole("option")
 				.map((o) => o.textContent),
-		).toEqual([...levels]);
+		).toEqual(["Desactivado", "Mínimo", "Bajo", "Medio", "Alto"]);
 		await userEvent.selectOptions(thinking, "high");
 		expect(send).toHaveBeenLastCalledWith({
 			type: "model_set",
@@ -148,13 +148,13 @@ describe("model picker (S32)", () => {
 			thinking: "high",
 		});
 		dispatchServer({ ...models, current: { provider: "openai", id: "gpt-4o-mini", name: "GPT-4o mini" } });
-		expect(screen.queryByRole("combobox", { name: "Thinking" })).not.toBeInTheDocument();
+		expect(screen.queryByRole("combobox", { name: "Razonamiento" })).not.toBeInTheDocument();
 	});
 
 	it("follows the chosen model, says when it waits for the next message, and shows errors inline", async () => {
 		await openPicker(vi.fn(), { ...ready, agentState: "thinking" });
 		dispatchServer({ ...models, next: { provider: "nan", id: "big", name: "NaN Big" } });
-		expect(screen.getByText("NaN Big is used from your next message.")).toBeInTheDocument();
+		expect(screen.getByText("NaN Big se usará a partir de tu próximo mensaje.")).toBeInTheDocument();
 		dispatchServer({ type: "error", code: "model_unavailable", message: "That model is not available." });
 		expect(within(screen.getByRole("dialog")).getByRole("alert")).toHaveTextContent(
 			"That model is not available.",
@@ -162,7 +162,7 @@ describe("model picker (S32)", () => {
 		// Inline, not a toast as well.
 		expect(document.querySelector(".notices")).toBeNull();
 		dispatchServer({ ...models, current: { provider: "nan", id: "big", name: "NaN Big", thinking: "low" } });
-		expect(screen.getByRole("button", { name: "Model: NaN Big" })).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Modelo: NaN Big" })).toBeInTheDocument();
 		expect(screen.queryByRole("alert")).not.toBeInTheDocument();
 	});
 });

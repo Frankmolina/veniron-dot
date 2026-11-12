@@ -41,7 +41,7 @@ vi.mock("../src/useDot.ts", () => ({
 }));
 
 const REFUSAL =
-	"Another Gentle Dot assistant is already running on port 4317. Stop it, then choose Restart assistant.";
+	"Another Gentle Dot assistant is already running on port 4317. Detener it, then choose Restart assistant.";
 const INFO: ConnectionInfo = { url: "ws://127.0.0.1:4317/ws", token: "abc" };
 
 async function renderApp(search: string) {

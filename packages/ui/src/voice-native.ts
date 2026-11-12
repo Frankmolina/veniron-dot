@@ -10,7 +10,7 @@ export interface NativeVoiceStatus {
 	reason?: string;
 }
 
-const UNAVAILABLE = "Voice is not available on this computer.";
+const UNAVAILABLE = "La voz no está disponible en este ordenador.";
 
 export async function nativeVoiceStatus(): Promise<NativeVoiceStatus> {
 	try {
@@ -64,7 +64,7 @@ export async function onNativeVoice(handlers: NativeVoiceHandlers): Promise<() =
 		}),
 		listen<{ message?: unknown }>("voice://error", (event) => {
 			const message = event.payload?.message;
-			handlers.error(typeof message === "string" && message ? message : "Listening stopped.");
+			handlers.error(typeof message === "string" && message ? message : "Se ha detenido la escucha.");
 		}),
 	]);
 	return () => {
@@ -76,7 +76,7 @@ export async function onNativeVoice(handlers: NativeVoiceHandlers): Promise<() =
 export function startRefusal(error: unknown): string {
 	if (typeof error === "string" && error) return error;
 	if (error instanceof Error && error.message) return error.message;
-	return "Could not start listening.";
+	return "No se ha podido empezar a escuchar.";
 }
 
 /**

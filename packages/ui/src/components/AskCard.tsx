@@ -17,8 +17,8 @@ export function AskCard({ ask, send, pin }: { ask: Ask; send: Send; pin?: PinSta
 	// The desktop app asks this one in a native dialog (S25.3); here it only shows that it waits.
 	if (ask.method === "app") {
 		return (
-			<section ref={card} className="ask-card" aria-label="Waiting for your answer in the app">
-				<p className="eyebrow">Needs your answer</p>
+			<section ref={card} className="ask-card" aria-label="Esperando tu respuesta en la aplicación">
+				<p className="eyebrow">Necesita tu respuesta</p>
 				<p className="ask-title">{ask.title}</p>
 				{ask.message ? <p className="connector-note">{ask.message}</p> : null}
 			</section>
@@ -28,25 +28,25 @@ export function AskCard({ ask, send, pin }: { ask: Ask; send: Send; pin?: PinSta
 	// On a server, an approval is allowed with the web PIN (S25.8); declining needs none.
 	if (ask.method === "pin") {
 		return (
-			<section ref={card} className="ask-card" aria-label="The assistant needs your answer">
-				<p className="eyebrow">Needs your answer</p>
+			<section ref={card} className="ask-card" aria-label="El asistente necesita tu respuesta">
+				<p className="eyebrow">Necesita tu respuesta</p>
 				<p className="ask-title">{ask.title}</p>
 				{ask.message ? (
 					// biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be reachable by keyboard.
-					<section className="ask-message" aria-label="Details" tabIndex={0}>
+					<section className="ask-message" aria-label="Detalles" tabIndex={0}>
 						{ask.message}
 					</section>
 				) : null}
 				<PinForm
 					pin={pin ?? { set: true }}
-					action="Allow"
+					action="Permitir"
 					onPin={(value, created) => {
 						if (created) send({ type: "pin_set", pin: value });
 						send({ type: "pin_approve", requestId: ask.requestId, pin: value });
 					}}
 				>
 					<button type="button" onClick={() => answer({ confirmed: false })}>
-						Deny
+						Denegar
 					</button>
 				</PinForm>
 			</section>
@@ -54,13 +54,13 @@ export function AskCard({ ask, send, pin }: { ask: Ask; send: Send; pin?: PinSta
 	}
 
 	return (
-		<section ref={card} className="ask-card" aria-label="The assistant needs your answer">
-			<p className="eyebrow">Needs your answer</p>
+		<section ref={card} className="ask-card" aria-label="El asistente necesita tu respuesta">
+			<p className="eyebrow">Necesita tu respuesta</p>
 			<p className="ask-title">{ask.title}</p>
 			{/* The whole text the user approves; long previews scroll inside the card. */}
 			{ask.message ? (
 				// biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be reachable by keyboard.
-				<section className="ask-message" aria-label="Details" tabIndex={0}>
+				<section className="ask-message" aria-label="Detalles" tabIndex={0}>
 					{ask.message}
 				</section>
 			) : null}
@@ -76,7 +76,7 @@ export function AskCard({ ask, send, pin }: { ask: Ask; send: Send; pin?: PinSta
 			{ask.method === "confirm" ? (
 				<div className="ask-options">
 					<button type="button" className="primary" onClick={() => answer({ confirmed: true })}>
-						Yes
+						Sí
 					</button>
 					<button type="button" onClick={() => answer({ confirmed: false })}>
 						No
@@ -107,12 +107,12 @@ export function AskCard({ ask, send, pin }: { ask: Ask; send: Send; pin?: PinSta
 						/>
 					)}
 					<button type="submit" className="primary">
-						Send answer
+						Enviar respuesta
 					</button>
 				</form>
 			) : null}
 			<button type="button" className="ask-skip" onClick={() => answer({ cancelled: true })}>
-				Skip
+				Omitir
 			</button>
 		</section>
 	);

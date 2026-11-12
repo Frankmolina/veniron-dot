@@ -125,7 +125,7 @@ describe.skipIf(!enabled)("@real-agent isolation probe", () => {
 		const exited = new Promise<number | null>((resolve) => child.on("close", resolve));
 		let memory: { instance_id?: string } | undefined;
 		try {
-			await waitFor(() => /Gentle Dot is running|failed to start/.test(output()), 240_000);
+			await waitFor(() => /VENIRON está en marcha|failed to start/.test(output()), 240_000);
 			const port = /127\.0\.0\.1:(\d+)/.exec(output())?.[1];
 			const health = await json<{ agentState: string }>(`http://127.0.0.1:${port}/health`);
 			// No memory server was running: the engine's memory plugin starts the global one,

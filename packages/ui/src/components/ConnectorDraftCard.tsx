@@ -26,16 +26,16 @@ export function ConnectorDraftCard({
 	const runs = draft.transport === "http" ? draft.url : [draft.command, ...(draft.args ?? [])].join(" ");
 
 	return (
-		<section ref={card} className="ask-card connector-draft" aria-label={`Add ${draft.name}?`}>
-			<p className="eyebrow">New connector</p>
-			<p className="ask-title">Add {draft.name}?</p>
+		<section ref={card} className="ask-card connector-draft" aria-label={`¿Añadir ${draft.name}?`}>
+			<p className="eyebrow">Nuevo conector</p>
+			<p className="ask-title">¿Añadir {draft.name}?</p>
 			{draft.description ? <p className="connector-note">{draft.description}</p> : null}
 			<dl className="connector-draft-details">
-				<dt>{draft.transport === "http" ? "Address" : "Runs on this computer"}</dt>
+				<dt>{draft.transport === "http" ? "Dirección" : "Se ejecuta en este ordenador"}</dt>
 				<dd>
 					<code>{runs}</code>
 				</dd>
-				<dt>Secrets it needs</dt>
+				<dt>Secretos que necesita</dt>
 				<dd>
 					{draft.envNames.length > 0
 						? draft.envNames.map((name) => (
@@ -43,17 +43,18 @@ export function ConnectorDraftCard({
 									{name}
 								</span>
 							))
-						: "None"}
+						: "Ninguno"}
 				</dd>
 				{draft.needsOAuth ? (
 					<>
-						<dt>Sign-in</dt>
-						<dd>You sign in on the service's own page.</dd>
+						<dt>Inicio de sesión</dt>
+						<dd>Inicias sesión en la propia página del servicio.</dd>
 					</>
 				) : null}
 			</dl>
 			<p className="connector-note">
-				You type each secret in the app, never in the chat. It starts read only, with all of its tools hidden.
+				Escribes cada secreto en la aplicación, nunca en el chat. Empieza en solo lectura, con todas sus
+				herramientas ocultas.
 			</p>
 			{appSend ? null : <p className="connector-note">{APP_REQUIRED}</p>}
 			<div className="ask-options">
@@ -66,10 +67,10 @@ export function ConnectorDraftCard({
 						approved();
 					}}
 				>
-					Add {draft.name}
+					Añadir {draft.name}
 				</button>
 				<button type="button" onClick={decline}>
-					Decline
+					Rechazar
 				</button>
 			</div>
 		</section>

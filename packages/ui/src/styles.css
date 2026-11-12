@@ -1,18 +1,18 @@
 /* Visual tokens measured from gentlemanprogramming.com (S15). Dark only. */
 :root {
-	--bg: #1a1218;
-	--bg-glass: rgba(26, 18, 24, 0.82);
-	--surface: #20161e;
-	--surface-2: #241822;
-	--line: #342230;
-	--text: #f6eff3;
-	--muted: #a78e9b;
-	--accent: #f095c8;
-	/* Text on the pink accent: white is 2.13:1 there, this is 8.60:1 (the site's pills do the same). */
-	--accent-ink: #1a1218;
-	--accent-soft: rgba(240, 149, 200, 0.12);
-	--accent-line: rgba(240, 149, 200, 0.35);
-	--accent-shadow: 0 10px 30px rgba(240, 149, 200, 0.3);
+	--bg: #0c0b0a;
+	--bg-glass: rgba(12, 11, 10, 0.86);
+	--surface: #161412;
+	--surface-2: #1f1c19;
+	--line: #2c2824;
+	--text: #fbf6ee;
+	--muted: #cbbba8;
+	--accent: #f3e6d4;
+	/* Text on the bone accent: the near-black ink stays readable. */
+	--accent-ink: #141210;
+	--accent-soft: rgba(243, 230, 212, 0.14);
+	--accent-line: rgba(243, 230, 212, 0.4);
+	--accent-shadow: 0 10px 30px rgba(243, 230, 212, 0.18);
 	--green: #b4e7c7;
 	--red: #ff718f;
 	--yellow: #e0c27a;
@@ -46,7 +46,7 @@ body,
 }
 
 body {
-	background: radial-gradient(900px 480px at 12% -12%, rgba(240, 149, 200, 0.1), transparent 70%), var(--bg);
+	background: radial-gradient(900px 480px at 12% -12%, rgba(251, 246, 238, 0.08), transparent 70%), var(--bg);
 }
 
 html[data-surface="dot"] body,
@@ -94,8 +94,8 @@ button.primary {
 }
 
 button.primary:hover:not(:disabled) {
-	background: #f4aad4;
-	border-color: #f4aad4;
+	background: #fffaf4;
+	border-color: #fffaf4;
 }
 
 button.primary:disabled {
@@ -200,9 +200,10 @@ textarea:focus {
 
 /* The window is this square (DOT_SIZE in shell.rs); outside the disc it stays transparent. */
 .dot {
-	--neon: #ff2d7a;
-	--neon-soft: rgba(255, 45, 122, 0.35);
-	--core: #ffd6e8;
+	--neon: #fbf6ee;
+	--neon-soft: rgba(251, 246, 238, 0.4);
+	--core: #fffaf4;
+	--panic: #e23b3b;
 	position: relative;
 	display: block;
 	width: 72px;
@@ -227,8 +228,8 @@ textarea:focus {
    The 3 px inset leaves room for its outer shadow inside the window. The rim carries a
    subtle state cue; the glow and the traveling light stay on the rose's strokes. */
 .dot-disc {
-	--rim: rgba(255, 45, 122, 0.22);
-	--rim-glow: rgba(255, 45, 122, 0);
+	--rim: rgba(251, 246, 238, 0.22);
+	--rim-glow: rgba(251, 246, 238, 0);
 	position: absolute;
 	inset: 3px;
 	border-radius: 50%;
@@ -243,12 +244,12 @@ textarea:focus {
 }
 
 .dot-thinking .dot-disc {
-	--rim: rgba(255, 45, 122, 0.32);
+	--rim: rgba(251, 246, 238, 0.4);
 }
 
 .dot-working .dot-disc {
-	--rim: rgba(255, 45, 122, 0.45);
-	--rim-glow: rgba(255, 45, 122, 0.22);
+	--rim: rgba(251, 246, 238, 0.7);
+	--rim-glow: rgba(251, 246, 238, 0.28);
 }
 
 .dot-needs_you .dot-disc {
@@ -267,8 +268,8 @@ textarea:focus {
 
 /* In control of the Mac (S24.6): the accent rim glows steadily over every other state. */
 .dot-in_control .dot-disc {
-	--rim: rgba(240, 149, 200, 0.8);
-	--rim-glow: rgba(240, 149, 200, 0.35);
+	--rim: rgba(251, 246, 238, 0.85);
+	--rim-glow: rgba(251, 246, 238, 0.4);
 }
 
 /* Yolo mode (S24.9): the rim turns amber while risky actions run unasked; after in-control so it wins. */
@@ -282,6 +283,36 @@ textarea:focus {
 	display: block;
 	width: 100%;
 	height: 100%;
+}
+
+.rose-mask {
+	position: absolute;
+	inset: 8% 14%;
+	width: 72%;
+	height: 84%;
+	object-fit: contain;
+	pointer-events: none;
+	filter: drop-shadow(0 0 1px var(--neon)) drop-shadow(0 0 3px var(--neon-soft));
+}
+
+.rose-working .rose-mask,
+.rose-thinking .rose-mask {
+	filter: drop-shadow(0 0 2px #fffaf4) drop-shadow(0 0 6px var(--neon));
+	animation: rose-breathe 2.4s ease-in-out infinite;
+}
+
+.rose-control .rose-mask {
+	filter: drop-shadow(0 0 2px #fffaf4) drop-shadow(0 0 6px var(--neon));
+	animation: rose-breathe 2s ease-in-out infinite;
+}
+
+.rose-panic .rose-mask {
+	filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 8px var(--panic));
+}
+
+.dot-halted .dot-disc {
+	--rim: rgba(226, 59, 59, 0.9);
+	--rim-glow: rgba(226, 59, 59, 0.45);
 }
 
 .rose svg {
@@ -576,8 +607,10 @@ html[data-effects="none"] .chat-panel {
 
 .rose-glyph {
 	flex: none;
-	color: #ff2d7a;
-	filter: drop-shadow(0 0 4px rgba(255, 45, 122, 0.45));
+	width: 18px;
+	height: 22px;
+	object-fit: contain;
+	filter: drop-shadow(0 0 4px rgba(251, 246, 238, 0.45));
 }
 
 .state-dot {
@@ -596,7 +629,7 @@ html[data-effects="none"] .chat-panel {
 .state-thinking,
 .state-working {
 	background: var(--accent);
-	box-shadow: 0 0 8px rgba(240, 149, 200, 0.6);
+	box-shadow: 0 0 8px rgba(243, 230, 212, 0.6);
 	animation: pulse 1s var(--ease) infinite;
 }
 
@@ -843,7 +876,7 @@ html[data-effects="none"] .chat-panel {
 	padding: 9px 13px;
 	border-radius: var(--radius-lg) var(--radius-lg) 4px var(--radius-lg);
 	border: 1px solid var(--accent-line);
-	background: rgba(240, 149, 200, 0.16);
+	background: rgba(243, 230, 212, 0.16);
 	color: var(--text);
 }
 
@@ -1157,12 +1190,12 @@ html[data-effects="none"] .chat-panel {
 }
 
 .composer-send:hover:not(:disabled) {
-	background: #f4aad4;
-	border-color: #f4aad4;
+	background: #fffaf4;
+	border-color: #fffaf4;
 }
 
 .composer-send:not(:disabled) {
-	box-shadow: 0 6px 18px rgba(240, 149, 200, 0.3);
+	box-shadow: 0 6px 18px rgba(243, 230, 212, 0.3);
 }
 
 .composer-send:disabled {
@@ -1274,7 +1307,7 @@ html[data-effects="none"] .chat-panel {
 	border-radius: var(--radius-md);
 	border: 1px solid var(--accent-line);
 	background: var(--surface);
-	box-shadow: 0 10px 30px rgba(240, 149, 200, 0.08);
+	box-shadow: 0 10px 30px rgba(243, 230, 212, 0.08);
 }
 
 .onboarding p {
@@ -1454,11 +1487,11 @@ html[data-surface="glow"] body {
 		circle,
 		rgba(255, 255, 255, 0.9) 0 12%,
 		var(--accent) 28%,
-		rgba(240, 149, 200, 0) 70%
+		rgba(243, 230, 212, 0) 70%
 	);
 	box-shadow:
-		0 0 12px 4px rgba(240, 149, 200, 0.55),
-		0 0 32px 10px rgba(240, 149, 200, 0.25);
+		0 0 12px 4px rgba(243, 230, 212, 0.55),
+		0 0 32px 10px rgba(243, 230, 212, 0.25);
 }
 
 .glow-click::after {
@@ -1475,7 +1508,7 @@ html[data-surface="glow"] body {
 	width: 16px;
 	height: 16px;
 	margin: -8px 0 0 -8px;
-	box-shadow: 0 0 10px 3px rgba(240, 149, 200, 0.45);
+	box-shadow: 0 0 10px 3px rgba(243, 230, 212, 0.45);
 	animation: glow-blip 600ms var(--ease) both;
 }
 
@@ -1485,8 +1518,8 @@ html[data-surface="glow"] body {
 	margin-top: -3px;
 	border-radius: var(--radius-pill);
 	transform-origin: 0 50%;
-	background: linear-gradient(90deg, rgba(240, 149, 200, 0), var(--accent));
-	box-shadow: 0 0 14px 3px rgba(240, 149, 200, 0.45);
+	background: linear-gradient(90deg, rgba(243, 230, 212, 0), var(--accent));
+	box-shadow: 0 0 14px 3px rgba(243, 230, 212, 0.45);
 	animation: glow-trail 450ms var(--ease) both;
 }
 
@@ -1498,8 +1531,8 @@ html[data-surface="glow"] body {
 	border-radius: var(--radius-sm);
 	background: var(--accent-soft);
 	box-shadow:
-		0 0 14px 2px rgba(240, 149, 200, 0.5),
-		inset 0 0 10px rgba(240, 149, 200, 0.3);
+		0 0 14px 2px rgba(243, 230, 212, 0.5),
+		inset 0 0 10px rgba(243, 230, 212, 0.3);
 	animation: glow-blip 600ms var(--ease) both;
 }
 
@@ -1557,14 +1590,14 @@ html[data-surface="glow"] body {
 	overflow: hidden;
 	background: linear-gradient(
 		90deg,
-		rgba(255, 45, 122, 0.15),
-		rgba(255, 45, 122, 0.55) 50%,
-		rgba(255, 45, 122, 0.15)
+		rgba(251, 246, 238, 0.15),
+		rgba(251, 246, 238, 0.55) 50%,
+		rgba(251, 246, 238, 0.15)
 	);
 	box-shadow:
-		0 0 6px rgba(255, 45, 122, 0.55),
-		0 0 14px rgba(255, 45, 122, 0.3);
-	border-bottom: 1px solid #ff2d7a;
+		0 0 6px rgba(251, 246, 238, 0.55),
+		0 0 14px rgba(251, 246, 238, 0.3);
+	border-bottom: 1px solid #fbf6ee;
 	pointer-events: none;
 }
 
@@ -1575,12 +1608,27 @@ html[data-surface="glow"] body {
 	left: 0;
 	width: 22%;
 	background: linear-gradient(90deg, transparent, #ffd6e8 50%, transparent);
-	filter: drop-shadow(0 0 4px #ff2d7a);
+	filter: drop-shadow(0 0 4px #fbf6ee);
 	animation: glow-travel 1.6s ease-in-out infinite;
 }
 
 .glow-static .glow-working-light {
 	display: none;
+}
+
+/* Stop and the panic shortcut (⌥⇧Esc): the edge turns red. */
+.glow-halt {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 3px;
+	background: #e23b3b;
+	box-shadow:
+		0 0 6px rgba(226, 59, 59, 0.7),
+		0 0 14px rgba(226, 59, 59, 0.4);
+	border-bottom: 1px solid #e23b3b;
+	pointer-events: none;
 }
 
 @keyframes glow-travel {

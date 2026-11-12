@@ -28,14 +28,14 @@ describe("gentle-dot command", () => {
 		});
 		const exited = new Promise((resolve) => child.on("close", resolve));
 		try {
-			await waitFor(() => output.includes("Gentle Dot is running"), 15_000);
+			await waitFor(() => output.includes("VENIRON está en marcha"), 15_000);
 		} finally {
 			child.kill("SIGTERM");
 			await exited;
 		}
 		const token = readFileSync(join(dataDir, "token"), "utf8").trim();
 		expect(output).not.toContain(token);
-		expect(output).toContain(`the access key is in ${join(dataDir, "token")}`);
+		expect(output).toContain(`la clave de acceso está en ${join(dataDir, "token")}`);
 		expect(statSync(dataDir).mode & 0o777).toBe(0o700);
 	});
 
@@ -66,7 +66,7 @@ describe("gentle-dot command", () => {
 			if (code === "still running") child.kill("SIGTERM");
 			expect(code).toBe(1);
 			expect(output).toMatch(/failed to start: Server mode .* root/);
-			expect(output).not.toContain("Gentle Dot is running");
+			expect(output).not.toContain("VENIRON está en marcha");
 		},
 	);
 

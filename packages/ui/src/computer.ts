@@ -37,12 +37,15 @@ export interface ComputerYolo {
 export interface ComputerState {
 	session?: ComputerSession;
 	yolo?: ComputerYolo;
+	/** Set when the session ended from Stop or the panic shortcut (⌥⇧Esc). */
+	halted?: "panic" | "stopped";
 }
 
 /** What the app reports on `computer://state` and from `computer_status`. */
 interface ComputerStateEvent {
 	active?: unknown;
 	endsAt?: unknown;
+	reason?: unknown;
 	yolo?: unknown;
 	yoloEndsAt?: unknown;
 }
@@ -177,7 +180,13 @@ function glowOf(payload: unknown): ComputerGlow | undefined {
 function stateOf(state: ComputerStateEvent | null | undefined): ComputerState {
 	const session = state?.active === true ? { ...timeOf(state.endsAt) } : undefined;
 	const yolo = state?.yolo === true ? { ...timeOf(state.yoloEndsAt) } : undefined;
-	return { ...(session ? { session } : {}), ...(yolo ? { yolo } : {}) };
+	const halted =
+		state?.active === true
+			? undefined
+			: state?.reason === "panic" || state?.reason === "stopped"
+				? state.reason
+				: undefined;
+	return { ...(session ? { session } : {}), ...(yolo ? { yolo } : {}), ...(halted ? { halted } : {}) };
 }
 
 /** `{endsAt}` in milliseconds when the app sent a time; one in seconds is read as such. */

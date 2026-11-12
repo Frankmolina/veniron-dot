@@ -65,16 +65,16 @@ pub struct TrayStatus {
 /// `None` for a state the protocol does not define.
 pub fn tray_status(state: &str) -> Option<TrayStatus> {
     let (label, glyph) = match state {
-        "starting" => ("Starting", TrayGlyph::Unavailable),
-        "idle" => ("Ready", TrayGlyph::Ready),
-        "thinking" => ("Thinking", TrayGlyph::Working),
-        "working" => ("Working", TrayGlyph::Working),
-        "needs_you" => ("Needs you", TrayGlyph::NeedsYou),
-        "restarting" => ("Restarting", TrayGlyph::Unavailable),
+        "starting" => ("Iniciando", TrayGlyph::Unavailable),
+        "idle" => ("Listo", TrayGlyph::Ready),
+        "thinking" => ("Pensando", TrayGlyph::Working),
+        "working" => ("Trabajando", TrayGlyph::Working),
+        "needs_you" => ("Te necesita", TrayGlyph::NeedsYou),
+        "restarting" => ("Reiniciando", TrayGlyph::Unavailable),
         "error" => ("Error", TrayGlyph::Unavailable),
         _ => return None,
     };
-    Some(TrayStatus { tooltip: format!("Gentle Dot — {label}"), glyph })
+    Some(TrayStatus { tooltip: format!("VENIRON — {label}"), glyph })
 }
 
 #[cfg(test)]
@@ -84,16 +84,16 @@ mod tests {
     #[test]
     fn maps_every_agent_state() {
         let cases = [
-            ("starting", "Starting"),
-            ("idle", "Ready"),
-            ("thinking", "Thinking"),
-            ("working", "Working"),
-            ("needs_you", "Needs you"),
-            ("restarting", "Restarting"),
+            ("starting", "Iniciando"),
+            ("idle", "Listo"),
+            ("thinking", "Pensando"),
+            ("working", "Trabajando"),
+            ("needs_you", "Te necesita"),
+            ("restarting", "Reiniciando"),
             ("error", "Error"),
         ];
         for (state, label) in cases {
-            assert_eq!(tray_status(state).unwrap().tooltip, format!("Gentle Dot — {label}"), "{state}");
+            assert_eq!(tray_status(state).unwrap().tooltip, format!("VENIRON — {label}"), "{state}");
         }
     }
 

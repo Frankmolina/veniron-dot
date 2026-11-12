@@ -66,13 +66,15 @@ impl Os {
         self != Os::Windows && compositor_places_windows(env)
     }
 
-    /// The panel shortcut a fresh install binds. macOS and Linux keep `Alt+Space`; Windows uses
-    /// `Ctrl+Alt+Space`, because `Alt+Space` opens the window menu in every app and a global
-    /// hotkey on it would take that menu away. The OS does not refuse it — measured on Windows 11,
-    /// `RegisterHotKey` accepts `Alt+Space`; the conflict is what makes it a poor default.
+    /// The panel shortcut a fresh install binds. macOS uses `Alt+V` (Hammerspoon holds `Alt+Space`
+    /// on Frank's Mac). Linux keeps `Alt+Space`. Windows uses `Ctrl+Alt+Space`, because `Alt+Space`
+    /// opens the window menu in every app and a global hotkey on it would take that menu away. The
+    /// OS does not refuse it — measured on Windows 11, `RegisterHotKey` accepts `Alt+Space`; the
+    /// conflict is what makes it a poor default. The user can still pick another shortcut.
     pub fn default_shortcut(self) -> &'static str {
         match self {
-            Os::MacOs | Os::Linux => "Alt+Space",
+            Os::MacOs => "Alt+V",
+            Os::Linux => "Alt+Space",
             Os::Windows => "Ctrl+Alt+Space",
         }
     }
@@ -245,8 +247,8 @@ mod windows_facts {
 }
 
 /// Window titles. Hyprland rules (`scripts/linux/hyprland/`) match them, so keep them stable.
-pub const DOT_TITLE: &str = "Gentle Dot";
-pub const PANEL_TITLE: &str = "Gentle Dot Panel";
+pub const DOT_TITLE: &str = "VENIRON";
+pub const PANEL_TITLE: &str = "VENIRON Panel";
 
 /// The panel page for a resolved [`WindowEffect`]. Without a backdrop effect, `effects=none` makes
 /// the UI paint an opaque background. Taking the effect rather than the OS is what keeps the URL
@@ -537,7 +539,7 @@ mod tests {
     fn every_os_picks_its_own_default_shortcut() {
         // Alt+Space opens the window menu on Windows, so the default must not name it there.
         assert_eq!(Os::Windows.default_shortcut(), "Ctrl+Alt+Space");
-        assert_eq!(Os::MacOs.default_shortcut(), "Alt+Space");
+        assert_eq!(Os::MacOs.default_shortcut(), "Alt+V");
         assert_eq!(Os::Linux.default_shortcut(), "Alt+Space");
     }
 

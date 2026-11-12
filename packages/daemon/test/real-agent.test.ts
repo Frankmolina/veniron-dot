@@ -57,7 +57,7 @@ describe.skipIf(!enabled)("@real-agent gentle-shell", () => {
 			.filter(Boolean)
 			.at(-1);
 		console.log(`identity answer: ${answer}`);
-		expect(answer).toMatch(/Gentle Dot/);
+		expect(answer).toMatch(/VENIRON/);
 		const shown = JSON.stringify(messages);
 		for (const name of HIDDEN_NAMES) expect(shown).not.toMatch(name);
 		ws.close();

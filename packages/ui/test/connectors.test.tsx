@@ -132,10 +132,9 @@ describe("ConnectorsPanel", () => {
 			}),
 		);
 		const discord = within(screen.getByRole("listitem", { name: "Discord" }));
-		expect(discord.getByText("Needs preparation")).toBeInTheDocument();
-		expect(discord.queryByText("Connected")).not.toBeInTheDocument();
-		expect(discord.queryByRole("button", { name: "Set up Discord" })).not.toBeInTheDocument();
-		await userEvent.setup().click(discord.getByRole("button", { name: "Prepare Discord" }));
+		expect(discord.getByText("Necesita preparación")).toBeInTheDocument();
+		expect(discord.queryByText("Conectado")).not.toBeInTheDocument();
+		await userEvent.setup().click(discord.getByRole("button", { name: "Preparar Discord" }));
 		expect(send).toHaveBeenCalledWith({ type: "connector_connect", connectorId: "discord" });
 	});
 
@@ -151,33 +150,33 @@ describe("ConnectorsPanel", () => {
 			event: { kind: "progress", message: "Preparing Discord…" },
 		});
 		panel(state);
-		expect(screen.getByText("Setting up Discord")).toBeInTheDocument();
+		expect(screen.getByText("Configurando Discord")).toBeInTheDocument();
 		expect(screen.getByText("Preparing Discord…")).toBeInTheDocument();
-		expect(screen.queryByText("Connected to Discord.")).not.toBeInTheDocument();
-		expect(screen.getByRole("button", { name: "Cancel" })).toBeEnabled();
+		expect(screen.queryByText("Conectado a Discord.")).not.toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Cancelar" })).toBeEnabled();
 	});
 
 	it("shows each connector with its status, what it can do, and the actions that apply", async () => {
 		const { send, dispatch } = panel(apply(ready, { type: "connectors", connectors: list, open: true }));
 		const notion = within(screen.getByRole("listitem", { name: "Notion" }));
-		expect(notion.getByText("Connected")).toBeInTheDocument();
+		expect(notion.getByText("Conectado")).toBeInTheDocument();
 		expect(notion.getByText("Search and read your pages.")).toBeInTheDocument();
-		expect(notion.getByRole("radio", { name: "Read only" })).toBeChecked();
+		expect(notion.getByRole("radio", { name: "Solo lectura" })).toBeChecked();
 		const linear = within(screen.getByRole("listitem", { name: "Linear" }));
-		expect(linear.getByText("Needs sign-in")).toBeInTheDocument();
+		expect(linear.getByText("Necesita inicio de sesión")).toBeInTheDocument();
 		expect(linear.getByText(/after you approve each one/)).toBeInTheDocument();
-		expect(linear.getByRole("radio", { name: "Read and send" })).toBeChecked();
+		expect(linear.getByRole("radio", { name: "Leer y enviar" })).toBeChecked();
 		const atlassian = within(screen.getByRole("listitem", { name: "Atlassian" }));
 		expect(atlassian.queryByRole("radio")).toBeNull();
 		expect(atlassian.queryByRole("button", { name: /Remove/ })).toBeNull();
 
 		const user = userEvent.setup();
-		await user.click(notion.getByRole("radio", { name: "Read and send" }));
-		await user.click(notion.getByRole("button", { name: "Sign in to Notion again" }));
-		await user.click(notion.getByRole("button", { name: "Disconnect Notion" }));
-		await user.click(notion.getByRole("button", { name: "Remove Notion" }));
-		await user.click(linear.getByRole("button", { name: "Sign in to Linear" }));
-		await user.click(atlassian.getByRole("button", { name: "Connect Atlassian" }));
+		await user.click(notion.getByRole("radio", { name: "Leer y enviar" }));
+		await user.click(notion.getByRole("button", { name: "Iniciar sesión en Notion de nuevo" }));
+		await user.click(notion.getByRole("button", { name: "Desconectar Notion" }));
+		await user.click(notion.getByRole("button", { name: "Quitar Notion" }));
+		await user.click(linear.getByRole("button", { name: "Iniciar sesión en Linear" }));
+		await user.click(atlassian.getByRole("button", { name: "Conectar Atlassian" }));
 		expect(send.mock.calls.map(([m]) => m)).toEqual([
 			{ type: "connector_mode", connectorId: "notion", mode: "read_write" },
 			{ type: "connector_signin", connectorId: "notion" },
@@ -197,9 +196,9 @@ describe("ConnectorsPanel", () => {
 		const off = [connector({ added: true, enabled: false, status: "off" })];
 		const { send } = panel(apply(ready, { type: "connectors", connectors: off, open: true }));
 		const notion = within(screen.getByRole("listitem", { name: "Notion" }));
-		expect(notion.getByText("Off")).toBeInTheDocument();
+		expect(notion.getByText("Apagado")).toBeInTheDocument();
 		expect(notion.queryByRole("button", { name: /Disconnect/ })).toBeNull();
-		await userEvent.setup().click(notion.getByRole("button", { name: "Connect Notion" }));
+		await userEvent.setup().click(notion.getByRole("button", { name: "Conectar Notion" }));
 		expect(send).toHaveBeenCalledWith({ type: "connector_connect", connectorId: "notion" });
 	});
 
@@ -223,13 +222,13 @@ describe("ConnectorsPanel", () => {
 			},
 		);
 		const { send, openUrl } = panel(s);
-		expect(screen.getByText("Signing in to Linear")).toBeInTheDocument();
+		expect(screen.getByText("Iniciando sesión en Linear")).toBeInTheDocument();
 		const user = userEvent.setup();
-		await user.click(screen.getByRole("button", { name: "Open the sign-in page" }));
+		await user.click(screen.getByRole("button", { name: "Abrir la página de inicio de sesión" }));
 		expect(openUrl).toHaveBeenCalledWith("https://auth.example.com/a");
 		await user.type(screen.getByLabelText("Paste the address"), "http://127.0.0.1:1/callback?code=c");
-		await user.click(screen.getByRole("button", { name: "Continue" }));
-		await user.click(screen.getByRole("button", { name: "Cancel" }));
+		await user.click(screen.getByRole("button", { name: "Continuar" }));
+		await user.click(screen.getByRole("button", { name: "Cancelar" }));
 		expect(send.mock.calls.map(([m]) => m)).toEqual([
 			{ type: "auth_reply", flowId: "connector-9", value: "http://127.0.0.1:1/callback?code=c" },
 			{ type: "auth_reply", flowId: "connector-9", cancelled: true },
@@ -241,8 +240,8 @@ describe("ConnectorsPanel", () => {
 		s = reduce(s, { type: "connector_started", connectorId: "notion" });
 		s = apply(s, { type: "auth_done", flowId: "connector-2", providerId: "notion", ok: true });
 		panel(s);
-		expect(screen.getByRole("status")).toHaveTextContent("Connected to Notion.");
-		expect(screen.getByRole("button", { name: "Back to connectors" })).toBeInTheDocument();
+		expect(screen.getByRole("status")).toHaveTextContent("Conectado a Notion.");
+		expect(screen.getByRole("button", { name: "Volver a los conectores" })).toBeInTheDocument();
 	});
 });
 
@@ -260,19 +259,19 @@ function Harness({ initial, send }: { initial: DotState; send: (m: ClientMessage
 	);
 }
 
-describe("Connectors in the panel", () => {
+describe("Conectores in the panel", () => {
 	it("opens from a header icon with a name and tooltip, and typing closes it", async () => {
 		const send = vi.fn();
 		render(<Harness initial={apply(ready, { type: "connectors", connectors: list })} send={send} />);
-		const button = screen.getByRole("button", { name: "Connectors" });
-		expect(button).toHaveAttribute("title", "Connectors");
+		const button = screen.getByRole("button", { name: "Conectores" });
+		expect(button).toHaveAttribute("title", "Conectores");
 		expect(button.querySelectorAll("svg")).toHaveLength(1);
 		const user = userEvent.setup();
 		await user.click(button);
 		expect(send).toHaveBeenCalledWith({ type: "connectors_list" });
-		expect(screen.getByRole("region", { name: "Connectors" })).toBeInTheDocument();
-		await user.type(screen.getByRole("textbox", { name: "Message" }), "h");
-		expect(screen.queryByRole("region", { name: "Connectors" })).toBeNull();
+		expect(screen.getByRole("region", { name: "Conectores" })).toBeInTheDocument();
+		await user.type(screen.getByRole("textbox", { name: "Mensaje" }), "h");
+		expect(screen.queryByRole("region", { name: "Conectores" })).toBeNull();
 	});
 
 	it("keeps a sign-in that waits for a pasted address while the user types", async () => {
@@ -283,8 +282,8 @@ describe("Connectors in the panel", () => {
 			prompt: { flowId: "connector-3", kind: "manual_code", message: "Paste" },
 		});
 		render(<Harness initial={s} send={vi.fn()} />);
-		await userEvent.setup().type(screen.getByRole("textbox", { name: "Message" }), "h");
-		expect(screen.getByRole("region", { name: "Connectors" })).toBeInTheDocument();
+		await userEvent.setup().type(screen.getByRole("textbox", { name: "Mensaje" }), "h");
+		expect(screen.getByRole("region", { name: "Conectores" })).toBeInTheDocument();
 	});
 });
 
@@ -295,7 +294,7 @@ describe("approval cards", () => {
 				ask={{
 					requestId: "r",
 					method: "confirm",
-					title: "Allow Notion to create pages?",
+					title: "Permitir Notion to create pages?",
 					message: "The assistant wants to create pages in Notion.\n\ntitle: Plan\nbody: Hello",
 				}}
 				send={vi.fn()}
@@ -327,15 +326,15 @@ describe("connector changes outside the desktop app (S25.2)", () => {
 		expect(screen.getByText(APP_REQUIRED)).toBeInTheDocument();
 		const notion = within(screen.getByRole("listitem", { name: "Notion" }));
 		for (const radio of notion.getAllByRole("radio")) expect(radio).toBeDisabled();
-		for (const name of ["Sign in to Notion again", "Disconnect Notion", "Remove Notion"])
+		for (const name of ["Iniciar sesión en Notion de nuevo", "Desconectar Notion", "Quitar Notion"])
 			expect(notion.getByRole("button", { name })).toBeDisabled();
 		const linear = within(screen.getByRole("listitem", { name: "Linear" }));
-		expect(linear.getByRole("button", { name: "Sign in to Linear" })).toBeDisabled();
+		expect(linear.getByRole("button", { name: "Iniciar sesión en Linear" })).toBeDisabled();
 		const atlassian = within(screen.getByRole("listitem", { name: "Atlassian" }));
-		await userEvent.setup().click(atlassian.getByRole("button", { name: "Connect Atlassian" }));
+		await userEvent.setup().click(atlassian.getByRole("button", { name: "Conectar Atlassian" }));
 		expect(send).not.toHaveBeenCalled();
 		// Reading stays available.
-		expect(screen.getByRole("button", { name: "Import my MCP servers" })).toBeEnabled();
+		expect(screen.getByRole("button", { name: "Importar mis servidores MCP" })).toBeEnabled();
 	});
 
 	it("an approval the app asks natively shows only that it waits there", () => {
@@ -344,14 +343,14 @@ describe("connector changes outside the desktop app (S25.2)", () => {
 				ask={{
 					requestId: "app-1",
 					method: "app",
-					title: "Allow Notion to create pages?",
-					message: "Waiting for your answer in the Gentle Dot app.",
+					title: "Permitir Notion to create pages?",
+					message: "Esperando tu respuesta en la app VENIRON.",
 				}}
 				send={vi.fn()}
 			/>,
 		);
-		expect(screen.getByText("Allow Notion to create pages?")).toBeInTheDocument();
-		expect(screen.getByText("Waiting for your answer in the Gentle Dot app.")).toBeInTheDocument();
+		expect(screen.getByText("Permitir Notion to create pages?")).toBeInTheDocument();
+		expect(screen.getByText("Esperando tu respuesta en la app VENIRON.")).toBeInTheDocument();
 		expect(screen.queryByRole("button")).toBeNull();
 	});
 });

@@ -7,8 +7,8 @@
 	<true/>
 	<!-- Voice input (S30.1): shown by macOS the first time the mic button is used. -->
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Gentle Dot listens to your voice when you press the microphone button.</string>
+	<string>VENIRON escucha tu voz cuando pulsas el botón del micrófono.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Gentle Dot turns what you say into a message when you press the microphone button.</string>
+	<string>VENIRON convierte lo que dices en un mensaje cuando pulsas el botón del micrófono.</string>
 </dict>
 </plist>

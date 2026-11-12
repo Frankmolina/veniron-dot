@@ -29,17 +29,17 @@ interface ConnectorsPanelProps {
 }
 
 const STATUS_LABELS: Record<ConnectorStatus, string> = {
-	off: "Off",
-	needs_setup: "Needs setup",
-	needs_preparation: "Needs preparation",
-	needs_signin: "Needs sign-in",
-	connected: "Connected",
-	error: "Sign-in failed",
+	off: "Apagado",
+	needs_setup: "Necesita configuración",
+	needs_preparation: "Necesita preparación",
+	needs_signin: "Necesita inicio de sesión",
+	connected: "Conectado",
+	error: "Inicio fallido",
 };
 
 /** What the chat says for "Add another connector"; the assistant answers with a draft to review. */
 export const addConnectorRequest = (what: string) =>
-	`Please help me add a connector for ${what}. Find its MCP server and draft it for me to review.`;
+	`Ayúdame a añadir un conector para ${what}. Busca su servidor MCP y prepárame un borrador para revisarlo.`;
 
 /** The apps the assistant can use, each signed in from here and set to read only or read and send. */
 export function ConnectorsPanel({
@@ -71,39 +71,39 @@ export function ConnectorsPanel({
 		flow?.flowId?.startsWith("connector-setup-") && flow.events.every((event) => event.kind === "progress");
 
 	return (
-		<section className="accounts connectors" aria-label="Connectors">
+		<section className="accounts connectors" aria-label="Conectores">
 			<header className="accounts-header">
-				<h2>Connectors</h2>
+				<h2>Conectores</h2>
 				<button
 					type="button"
 					className="icon"
-					aria-label="Close connectors"
+					aria-label="Cerrar conectores"
 					onClick={() => dispatch({ type: "connectors", open: false })}
 				>
 					×
 				</button>
 			</header>
 			<p className="muted">
-				Let the assistant use your other apps. It always asks you before it sends or changes anything.
+				Deja que el asistente use tus otras aplicaciones. Siempre te pregunta antes de enviar o cambiar algo.
 			</p>
 			{appSend ? null : <p className="connector-note">{APP_REQUIRED}</p>}
 
 			{flow ? (
 				<div className="auth-flow">
 					<p className="auth-flow-title">
-						{settingUp ? "Setting up" : "Signing in to"} {name(flow.providerId)}
+						{settingUp ? "Configurando" : "Iniciando sesión en"} {name(flow.providerId)}
 					</p>
 					{flow.events.map((event, i) => (
 						// biome-ignore lint/suspicious/noArrayIndexKey: events are append-only and never reordered
 						<FlowEvent key={`${event.kind}-${i}`} event={event} openUrl={openUrl} />
 					))}
 					{flow.prompt ? <FlowPrompt key={flow.prompt.message} prompt={flow.prompt} send={send} /> : null}
-					{busy && !flow.prompt && flow.events.length === 0 ? <p className="muted">Starting…</p> : null}
+					{busy && !flow.prompt && flow.events.length === 0 ? <p className="muted">Iniciando…</p> : null}
 					{flow.done ? (
 						<p className={`auth-result ${flow.done.ok ? "ok" : "failed"}`} role="status">
 							{flow.done.ok
-								? `Connected to ${name(flow.providerId)}.`
-								: (flow.done.message ?? "Sign-in did not finish.")}
+								? `Conectado a ${name(flow.providerId)}.`
+								: (flow.done.message ?? "El inicio de sesión no ha terminado.")}
 						</p>
 					) : null}
 					<div className="auth-actions">
@@ -112,12 +112,12 @@ export function ConnectorsPanel({
 								type="button"
 								onClick={() => send({ type: "auth_reply", flowId: flow.flowId ?? "", cancelled: true })}
 							>
-								Cancel
+								Cancelar
 							</button>
 						) : null}
 						{flow.done ? (
 							<button type="button" onClick={() => dispatch({ type: "connectors", open: true })}>
-								Back to connectors
+								Volver a los conectores
 							</button>
 						) : null}
 					</div>
@@ -134,10 +134,10 @@ export function ConnectorsPanel({
 				<>
 					<div className="connector-actions">
 						<button type="button" onClick={() => setAdding(!adding)} aria-expanded={adding}>
-							Add another connector
+							Añadir otro conector
 						</button>
 						<button type="button" onClick={() => send({ type: "connectors_scan" })}>
-							Import my MCP servers
+							Importar mis servidores MCP
 						</button>
 					</div>
 					{adding ? (
@@ -207,8 +207,8 @@ function ConnectorGuideView({ connector: c, openUrl, back, next, canChange }: Co
 	const guide = c.guide;
 	if (!guide) return null;
 	return (
-		<section className="connector-guide" aria-label={`Set up ${c.name}`}>
-			<h3>Set up {c.name}</h3>
+		<section className="connector-guide" aria-label={`Configurar ${c.name}`}>
+			<h3>Configurar {c.name}</h3>
 			<ol>
 				{guide.steps.map((step) => (
 					<li key={step} className="connector-step">
@@ -218,24 +218,24 @@ function ConnectorGuideView({ connector: c, openUrl, back, next, canChange }: Co
 			</ol>
 			{guide.redirectUrl ? (
 				<div className="connector-redirect">
-					<span>Redirect URL to add</span>
+					<span>URL de redirección que debes añadir</span>
 					<code>{guide.redirectUrl}</code>
 				</div>
 			) : null}
 			<div className="connector-links">
 				{guide.links.map((link) => (
 					<button key={link.url} type="button" className="link" onClick={() => openUrl(link.url)}>
-						Open {link.label}
+						Abrir {link.label}
 					</button>
 				))}
 			</div>
 			{guide.note ? <p className="connector-note">{guide.note}</p> : null}
 			<div className="auth-actions">
 				<button type="button" onClick={back}>
-					Back
+					Atrás
 				</button>
 				<button type="button" className="primary" disabled={!canChange} onClick={next}>
-					Continue
+					Continuar
 				</button>
 			</div>
 		</section>
@@ -253,24 +253,24 @@ function AddAnother({ ask, cancel }: { ask: (what: string) => void; cancel: () =
 			}}
 		>
 			<label>
-				<span>What do you want to connect?</span>
+				<span>¿Qué quieres conectar?</span>
 				<input
 					type="text"
 					autoComplete="off"
-					placeholder="For example GitHub or Jira"
+					placeholder="Por ejemplo GitHub o Jira"
 					value={what}
 					onChange={(event) => setWhat(event.target.value)}
 				/>
 			</label>
 			<p className="connector-note">
-				The assistant looks for its server and sends you a draft. Nothing is added until you approve it.
+				El asistente busca su servidor y te envía un borrador. No se añade nada hasta que lo apruebes.
 			</p>
 			<div className="auth-actions">
 				<button type="submit" className="primary" disabled={!what.trim()}>
-					Ask the assistant
+					Preguntar al asistente
 				</button>
 				<button type="button" onClick={cancel}>
-					Cancel
+					Cancelar
 				</button>
 			</div>
 		</form>
@@ -291,15 +291,15 @@ function ImportList({ found, importServers, close }: ImportListProps) {
 		setChosen((current) => (current.includes(id) ? current.filter((c) => c !== id) : [...current, id]));
 	const count = chosen.length;
 	return (
-		<section className="connector-imports" aria-label="Found these servers">
-			<h3>Found these servers</h3>
+		<section className="connector-imports" aria-label="Servidores encontrados">
+			<h3>Servidores encontrados</h3>
 			{found.length === 0 ? (
-				<p className="muted">No MCP servers were found in your other apps.</p>
+				<p className="muted">No se han encontrado servidores MCP en tus otras aplicaciones.</p>
 			) : (
 				<>
 					<p className="connector-note">
-						Imported servers start read only, with all of their tools hidden. Their keys stay on this
-						computer; your other apps are not changed.
+						Los servidores importados empiezan en solo lectura, con todas sus herramientas ocultas. Sus claves
+						se quedan en este ordenador; tus otras aplicaciones no se modifican.
 					</p>
 					<ul>
 						{found.map((candidate) => (
@@ -313,18 +313,18 @@ function ImportList({ found, importServers, close }: ImportListProps) {
 										onChange={() => toggle(candidate.id)}
 									/>
 									<b>{candidate.name}</b>
-									<span className="muted">From {candidate.sources.join(", ")}</span>
+									<span className="muted">De {candidate.sources.join(", ")}</span>
 								</label>
 								{candidate.summary ? <code>{candidate.summary}</code> : null}
-								<ImportNames label="Keys" names={[...candidate.envNames, ...candidate.headerNames]} />
-								<ImportNames label="You will type" names={candidate.inputs} />
+								<ImportNames label="Claves" names={[...candidate.envNames, ...candidate.headerNames]} />
+								<ImportNames label="Tendrás que escribir" names={candidate.inputs} />
 								{candidate.notes?.map((note) => (
 									<p key={note} className="connector-note">
 										{note}
 									</p>
 								))}
 								{candidate.duplicateOf ? (
-									<p className="connector-note">Already in your connectors as {candidate.duplicateOf}.</p>
+									<p className="connector-note">Ya está en tus conectores como {candidate.duplicateOf}.</p>
 								) : candidate.reason ? (
 									<p className="connector-note">{candidate.reason}</p>
 								) : null}
@@ -341,11 +341,11 @@ function ImportList({ found, importServers, close }: ImportListProps) {
 						disabled={count === 0 || !importServers}
 						onClick={() => importServers?.(chosen)}
 					>
-						{count === 0 ? "Import" : `Import ${count} server${count === 1 ? "" : "s"}`}
+						{count === 0 ? "Importar" : `Importar ${count} servidor${count === 1 ? "" : "es"}`}
 					</button>
 				) : null}
 				<button type="button" onClick={close}>
-					Close the list
+					Cerrar la lista
 				</button>
 			</div>
 		</section>
@@ -379,8 +379,8 @@ function ConnectorRow({ connector: c, appSend, connect, signIn, setUp }: Connect
 	const locked = !appSend;
 	const nameId = `connector-${c.id}`;
 	const readOnlyNote = c.custom
-		? "Its tools stay hidden until you choose Read and send. Then it asks you before every action."
-		: "It cannot send or change anything.";
+		? "Sus herramientas siguen ocultas hasta que elijas Leer y enviar. Después te pregunta antes de cada acción."
+		: "No puede enviar ni cambiar nada.";
 	const canSignIn =
 		c.enabled && !c.noSignIn && c.status !== "needs_setup" && c.status !== "needs_preparation";
 	return (
@@ -399,11 +399,11 @@ function ConnectorRow({ connector: c, appSend, connect, signIn, setUp }: Connect
 			<p className="connector-note">{c.mode === "read_write" ? c.sends : readOnlyNote}</p>
 			{c.enabled ? (
 				<fieldset className="connector-mode">
-					<legend>What {c.name} may do</legend>
+					<legend>Qué puede hacer {c.name}</legend>
 					{(
 						[
-							["read_only", "Read only"],
-							["read_write", "Read and send"],
+							["read_only", "Solo lectura"],
+							["read_write", "Leer y enviar"],
 						] as const
 					).map(([mode, label]) => (
 						<label key={mode}>
@@ -424,22 +424,22 @@ function ConnectorRow({ connector: c, appSend, connect, signIn, setUp }: Connect
 					<button
 						type="button"
 						className="primary"
-						aria-label={`Connect ${c.name}`}
+						aria-label={`Conectar ${c.name}`}
 						disabled={locked}
 						onClick={connect}
 					>
-						Connect
+						Conectar
 					</button>
 				)}
 				{c.enabled && c.status === "needs_setup" ? (
 					<button
 						type="button"
 						className="primary"
-						aria-label={`Set up ${c.name}`}
+						aria-label={`Configurar ${c.name}`}
 						disabled={locked}
 						onClick={setUp}
 					>
-						Set up
+						Configurar
 					</button>
 				) : null}
 				{c.enabled && c.status === "needs_preparation" ? (
@@ -447,48 +447,53 @@ function ConnectorRow({ connector: c, appSend, connect, signIn, setUp }: Connect
 					<button
 						type="button"
 						className="primary"
-						aria-label={`Prepare ${c.name}`}
+						aria-label={`Preparar ${c.name}`}
 						disabled={locked}
 						onClick={connect}
 					>
-						Prepare
+						Preparar
 					</button>
 				) : null}
 				{canSignIn && c.status !== "connected" ? (
 					<button
 						type="button"
 						className="primary"
-						aria-label={`Sign in to ${c.name}`}
+						aria-label={`Iniciar sesión en ${c.name}`}
 						disabled={locked}
 						onClick={signIn}
 					>
-						Sign in
+						Iniciar sesión
 					</button>
 				) : null}
 				{canSignIn && c.status === "connected" ? (
-					<button type="button" aria-label={`Sign in to ${c.name} again`} disabled={locked} onClick={signIn}>
-						Sign in again
+					<button
+						type="button"
+						aria-label={`Iniciar sesión en ${c.name} de nuevo`}
+						disabled={locked}
+						onClick={signIn}
+					>
+						Iniciar sesión de nuevo
 					</button>
 				) : null}
 				{c.enabled ? (
 					<button
 						type="button"
-						aria-label={`Disconnect ${c.name}`}
+						aria-label={`Desconectar ${c.name}`}
 						disabled={locked}
 						onClick={() => appSend?.({ type: "connector_disconnect", connectorId: c.id })}
 					>
-						Disconnect
+						Desconectar
 					</button>
 				) : null}
 				{c.added ? (
 					<button
 						type="button"
 						className="link"
-						aria-label={`Remove ${c.name}`}
+						aria-label={`Quitar ${c.name}`}
 						disabled={locked}
 						onClick={() => appSend?.({ type: "connector_remove", connectorId: c.id })}
 					>
-						Remove
+						Quitar
 					</button>
 				) : null}
 			</div>

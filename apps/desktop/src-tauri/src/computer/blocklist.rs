@@ -20,7 +20,7 @@ struct Entry {
     names: &'static [&'static str],
 }
 
-pub const GENTLE_DOT_BUNDLE: &str = "dev.gentleman.gentle-dot";
+pub const GENTLE_DOT_BUNDLE: &str = "app.veniron.dot";
 
 /// The name Windows gives an app it does not identify (a process it does not let be queried, a
 /// Store frame whose app is not found). It is blocked: an action aimed there is refused.
@@ -28,7 +28,11 @@ pub const UNIDENTIFIED: &str = "Unidentified app";
 
 /// macOS.
 const MACOS: &[Entry] = &[
-    Entry { label: "Gentle Dot", bundles: &[GENTLE_DOT_BUNDLE], names: &["Gentle Dot"] },
+    Entry {
+        label: "Gentle Dot",
+        bundles: &[GENTLE_DOT_BUNDLE, "dev.gentleman.gentle-dot"],
+        names: &["VENIRON", "VENIRON Panel", "Gentle Dot"],
+    },
     Entry {
         label: "System Settings",
         bundles: &["com.apple.systempreferences"],
@@ -68,7 +72,7 @@ const MACOS: &[Entry] = &[
 /// Windows: Settings and Control Panel, Windows Security, the UAC, credential, and sign-in
 /// prompts, Credential Manager, and the known password managers.
 const WINDOWS: &[Entry] = &[
-    Entry { label: "Gentle Dot", bundles: &["gentle-dot"], names: &["Gentle Dot"] },
+    Entry { label: "Gentle Dot", bundles: &["gentle-dot", "veniron"], names: &["Gentle Dot", "VENIRON"] },
     Entry { label: "Settings", bundles: &["systemsettings"], names: &["Settings", "Windows Settings"] },
     Entry { label: "Control Panel", bundles: &["control"], names: &["Control Panel"] },
     Entry {
@@ -208,6 +212,7 @@ mod tests {
             ("com.lastpass.LastPass", "LastPass"),
             ("com.apple.Passwords", "Passwords"),
             ("dev.gentleman.gentle-dot", "Gentle Dot"),
+            ("app.veniron.dot", "Gentle Dot"),
             ("com.apple.UserNotificationCenter", "UserNotificationCenter"),
             ("com.apple.LocalAuthentication.UIAgent", "LocalAuthentication"),
             ("com.apple.CoreServicesUIAgent", "CoreServicesUIAgent"),

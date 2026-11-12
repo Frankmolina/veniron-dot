@@ -117,7 +117,7 @@ const server = (...payloads: ServerPayload[]) =>
 	act(() => {
 		for (const payload of payloads) h.server(payload);
 	});
-const talk = () => screen.getByRole("button", { name: "Talk" });
+const talk = () => screen.getByRole("button", { name: "Hablar" });
 
 function setSecure(secure: boolean) {
 	Object.defineProperty(window, "isSecureContext", { value: secure, configurable: true });
@@ -155,7 +155,7 @@ afterEach(() => {
 /** A voice turn through the daemon: record, stop, transcript, and the reply's messages. */
 async function voiceTurn(transcript: string) {
 	await userEvent.click(talk());
-	await userEvent.click(await screen.findByRole("button", { name: "Stop and send" }));
+	await userEvent.click(await screen.findByRole("button", { name: "Detener y enviar" }));
 	const request = await waitFor(() => {
 		const found = sentOf("voice_transcribe").at(-1);
 		if (!found) throw new Error("no voice_transcribe yet");
@@ -168,7 +168,7 @@ async function voiceTurn(transcript: string) {
 describe("the mic in the browser", () => {
 	it("is hidden without an OpenAI key, and so is the mute toggle", () => {
 		render(<Harness initial={withVoice(false)} />);
-		expect(screen.queryByRole("button", { name: "Talk" })).not.toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: "Hablar" })).not.toBeInTheDocument();
 		expect(screen.queryByRole("button", { name: /spoken replies/ })).not.toBeInTheDocument();
 	});
 
@@ -176,7 +176,7 @@ describe("the mic in the browser", () => {
 		setSecure(false);
 		render(<Harness initial={withVoice(true)} />);
 		expect(talk()).toBeDisabled();
-		expect(talk()).toHaveAccessibleDescription("Voice needs a secure page (HTTPS or localhost).");
+		expect(talk()).toHaveAccessibleDescription("La voz necesita una página segura (HTTPS o localhost).");
 	});
 
 	it("appears once the accounts list reports voice", () => {
@@ -192,10 +192,10 @@ describe("talking through the daemon", () => {
 		await userEvent.click(talk());
 		expect(getUserMedia).toHaveBeenCalledWith({ audio: true });
 		expect(await screen.findByRole("timer")).toHaveTextContent("0:00");
-		expect(screen.getByRole("meter", { name: "Microphone level" })).toBeInTheDocument();
-		expect(screen.queryByRole("textbox", { name: "Message" })).not.toBeInTheDocument();
+		expect(screen.getByRole("meter", { name: "Nivel del micrófono" })).toBeInTheDocument();
+		expect(screen.queryByRole("textbox", { name: "Mensaje" })).not.toBeInTheDocument();
 
-		await userEvent.click(screen.getByRole("button", { name: "Stop and send" }));
+		await userEvent.click(screen.getByRole("button", { name: "Detener y enviar" }));
 		const request = await waitFor(() => {
 			const found = sentOf("voice_transcribe")[0];
 			if (!found) throw new Error("not sent");
@@ -204,7 +204,7 @@ describe("talking through the daemon", () => {
 		expect(request.mime).toBe("audio/webm;codecs=opus");
 		expect(request.data).toBe(btoa("fake audio"));
 		expect(track.stop).toHaveBeenCalled();
-		expect(screen.getByRole("status", { name: "Voice" })).toHaveTextContent("Transcribing…");
+		expect(screen.getByRole("status", { name: "Voz" })).toHaveTextContent("Transcribiendo…");
 
 		server({ type: "voice_transcript", requestId: request.requestId, text: "remind me at five" });
 		expect(sentOf("send")).toEqual([
@@ -212,13 +212,13 @@ describe("talking through the daemon", () => {
 		]);
 		server({ type: "user_message", messageId: "u1", text: "remind me at five" });
 		expect(screen.getByText("remind me at five")).toBeInTheDocument();
-		expect(screen.getByRole("textbox", { name: "Message" })).toBeInTheDocument();
+		expect(screen.getByRole("textbox", { name: "Mensaje" })).toBeInTheDocument();
 	});
 
 	it("cancels with ✕ or Esc without sending anything, and Esc does not reach the panel", async () => {
 		render(<Harness initial={withVoice(true)} />);
 		await userEvent.click(talk());
-		await userEvent.click(await screen.findByRole("button", { name: "Cancel recording" }));
+		await userEvent.click(await screen.findByRole("button", { name: "Cancelar la grabación" }));
 		expect(talk()).toBeEnabled();
 
 		await userEvent.click(talk());
@@ -247,7 +247,7 @@ describe("talking through the daemon", () => {
 	it("shows why when the daemon cannot transcribe, and sends nothing", async () => {
 		render(<Harness initial={withVoice(true)} />);
 		await userEvent.click(talk());
-		await userEvent.click(await screen.findByRole("button", { name: "Stop and send" }));
+		await userEvent.click(await screen.findByRole("button", { name: "Detener y enviar" }));
 		const request = await waitFor(() => {
 			const found = sentOf("voice_transcribe")[0];
 			if (!found) throw new Error("not sent");
@@ -256,10 +256,10 @@ describe("talking through the daemon", () => {
 		server({
 			type: "voice_unavailable",
 			requestId: request.requestId,
-			reason: "OpenAI did not accept the API key. Check it in Accounts.",
+			reason: "OpenAI did not accept the API key. Check it in Cuentas.",
 		});
-		expect(screen.getByRole("status", { name: "Voice" })).toHaveTextContent(
-			"OpenAI did not accept the API key. Check it in Accounts.",
+		expect(screen.getByRole("status", { name: "Voz" })).toHaveTextContent(
+			"OpenAI did not accept the API key. Check it in Cuentas.",
 		);
 		expect(sentOf("send")).toEqual([]);
 	});
@@ -288,16 +288,16 @@ describe("talking on the desktop", () => {
 		emit("voice://partial", { text: "hola" });
 		emit("voice://level", { level: 0.5 });
 		expect(screen.getByText("hola")).toBeInTheDocument();
-		expect((screen.getByRole("meter", { name: "Microphone level" }) as HTMLMeterElement).value).toBe(0.5);
-		await userEvent.click(screen.getByRole("button", { name: "Stop and send" }));
+		expect((screen.getByRole("meter", { name: "Nivel del micrófono" }) as HTMLMeterElement).value).toBe(0.5);
+		await userEvent.click(screen.getByRole("button", { name: "Detener y enviar" }));
 		await waitFor(() =>
 			expect(sentOf("send")).toEqual([{ type: "send", text: "hola mundo", requestId: expect.any(String) }]),
 		);
 		expect(invoked("voice_stop")).toHaveLength(1);
 	});
 
-	it("useVoice re-checks voice status when the local model is installed or removed", async () => {
-		const noModel = { available: false, reason: "Download the local voice model in Connectors." };
+	it("useVoz re-checks voice status when the local model is installed or removed", async () => {
+		const noModel = { available: false, reason: "Download the local voice model in Conectores." };
 		let status: unknown = noModel;
 		h.tauri = true;
 		h.invoke = vi.fn(async (command: string) => (command === "voice_status" ? status : undefined));
@@ -334,7 +334,7 @@ describe("talking on the desktop", () => {
 		render(<Harness initial={withVoice(false)} />);
 		await waitFor(() => expect(talk()).toBeEnabled());
 		await userEvent.click(talk());
-		await userEvent.click(await screen.findByRole("button", { name: "Cancel recording" }));
+		await userEvent.click(await screen.findByRole("button", { name: "Cancelar la grabación" }));
 		expect(invoked("voice_cancel")).toHaveLength(1);
 		expect(sentOf("send")).toEqual([]);
 	});
@@ -346,7 +346,7 @@ describe("talking on the desktop", () => {
 		await userEvent.click(talk());
 		await screen.findByRole("timer");
 		emit("voice://error", { message: "Speech recognition stopped." });
-		expect(screen.getByRole("status", { name: "Voice" })).toHaveTextContent("Speech recognition stopped.");
+		expect(screen.getByRole("status", { name: "Voz" })).toHaveTextContent("Speech recognition stopped.");
 		expect(talk()).toBeEnabled();
 	});
 
@@ -397,7 +397,7 @@ describe("spoken replies", () => {
 
 	it("does not read replies to typed messages", async () => {
 		render(<Harness initial={withVoice(true, false)} />);
-		await userEvent.type(screen.getByRole("textbox", { name: "Message" }), "typed{Enter}");
+		await userEvent.type(screen.getByRole("textbox", { name: "Mensaje" }), "typed{Enter}");
 		reply("a1", "A typed answer.");
 		await new Promise((r) => setTimeout(r, 20));
 		expect(synth.speak).not.toHaveBeenCalled();
@@ -421,8 +421,8 @@ describe("spoken replies", () => {
 
 	it("stays silent while muted, and remembers the choice", async () => {
 		const { unmount } = render(<Harness initial={withVoice(true, false)} />);
-		await userEvent.click(screen.getByRole("button", { name: "Mute spoken replies" }));
-		expect(screen.getByRole("button", { name: "Unmute spoken replies" })).toHaveAttribute(
+		await userEvent.click(screen.getByRole("button", { name: "Silenciar las respuestas habladas" }));
+		expect(screen.getByRole("button", { name: "Activar las respuestas habladas" })).toHaveAttribute(
 			"aria-pressed",
 			"true",
 		);
@@ -432,15 +432,15 @@ describe("spoken replies", () => {
 		expect(synth.speak).not.toHaveBeenCalled();
 		unmount();
 		render(<Harness initial={withVoice(true, false)} />);
-		expect(screen.getByRole("button", { name: "Unmute spoken replies" })).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Activar las respuestas habladas" })).toBeInTheDocument();
 	});
 
-	it("cuts the speech when the user presses Stop or starts to talk", async () => {
+	it("cuts the speech when the user presses Detener or starts to talk", async () => {
 		render(<Harness initial={withVoice(true, false)} />);
 		await voiceTurn("hi");
 		reply("a1", "A long answer to read.");
 		await waitFor(() => expect(synth.speak).toHaveBeenCalled());
-		await userEvent.click(screen.getByRole("button", { name: "Stop" }));
+		await userEvent.click(screen.getByRole("button", { name: "Detener" }));
 		expect(synth.cancel).toHaveBeenCalled();
 		expect(sentOf("abort")).toEqual([]);
 
@@ -456,14 +456,14 @@ describe("spoken replies", () => {
 describe("the composer with the mic present", () => {
 	it("still sends typed messages, steers while busy, and stops the run as before", async () => {
 		render(<Harness initial={withVoice(true)} />);
-		const box = screen.getByRole("textbox", { name: "Message" });
+		const box = screen.getByRole("textbox", { name: "Mensaje" });
 		await userEvent.type(box, "first{Enter}");
 		expect(sentOf("send")).toEqual([{ type: "send", text: "first", requestId: expect.any(String) }]);
 		server({ type: "agent_state", state: "working" });
-		expect(box).toHaveAttribute("placeholder", "Add to what I'm doing…");
+		expect(box).toHaveAttribute("placeholder", "Añade a lo que estoy haciendo…");
 		await userEvent.type(box, "more{Enter}");
 		expect(sentOf("send").map((m) => m.text)).toEqual(["first", "more"]);
-		await userEvent.click(screen.getByRole("button", { name: "Stop" }));
+		await userEvent.click(screen.getByRole("button", { name: "Detener" }));
 		expect(sentOf("abort")).toEqual([{ type: "abort" }]);
 	});
 });
@@ -487,7 +487,7 @@ describe("reviewing a dictation before sending (the default)", () => {
 		await waitFor(() => expect(talk()).toBeEnabled());
 		await userEvent.type(box(), "dijo:");
 		await userEvent.click(talk());
-		await userEvent.click(await screen.findByRole("button", { name: "Stop and review" }));
+		await userEvent.click(await screen.findByRole("button", { name: "Detener y revisar" }));
 		await waitFor(() => expect(box().value).toBe("dijo: hola mundo"));
 		expect(sentOf("send")).toEqual([]);
 		await waitFor(() => expect(box()).toHaveFocus());
@@ -503,7 +503,7 @@ describe("reviewing a dictation before sending (the default)", () => {
 		render(<Harness initial={withVoice(false, false)} />);
 		await waitFor(() => expect(talk()).toBeEnabled());
 		await userEvent.click(talk());
-		await userEvent.click(await screen.findByRole("button", { name: "Stop and review" }));
+		await userEvent.click(await screen.findByRole("button", { name: "Detener y revisar" }));
 		await waitFor(() => expect(box().value).toBe("hi"));
 		await userEvent.type(box(), "{Enter}");
 		server({ type: "user_message", messageId: "u1", text: "hi" });
@@ -520,12 +520,12 @@ describe("reviewing a dictation before sending (the default)", () => {
 		render(<Harness initial={withVoice(false)} />);
 		await waitFor(() => expect(talk()).toBeEnabled());
 		await userEvent.click(talk());
-		const option = await screen.findByRole("switch", { name: "Send when I stop" });
+		const option = await screen.findByRole("switch", { name: "Enviar cuando pare" });
 		expect(option).toHaveAttribute("aria-checked", "false");
 		await userEvent.click(option);
 		expect(option).toHaveAttribute("aria-checked", "true");
 		expect(localStorage.getItem("gentle-dot-voice-send")).toBe("1");
-		await userEvent.click(screen.getByRole("button", { name: "Stop and send" }));
+		await userEvent.click(screen.getByRole("button", { name: "Detener y enviar" }));
 		await waitFor(() =>
 			expect(sentOf("send")).toEqual([{ type: "send", text: "hola", requestId: expect.any(String) }]),
 		);

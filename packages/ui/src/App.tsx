@@ -73,7 +73,7 @@ function Assistant({ surface }: { surface: Surface }) {
 	conversations.current = state.features.conversations;
 	// Computer control lives in the desktop app only (S24.7); the panel registers the helper.
 	const desktop = inDesktop();
-	const { session: computerSession, yolo } = useComputerState(desktop && surface !== "web");
+	const { session: computerSession, yolo, halted } = useComputerState(desktop && surface !== "web");
 	const computerAvailable = useComputerAvailable(desktop && surface === "panel", state.connection === "open");
 	// Connector changes go through the app, on behalf of this window (S25.2); the web page has none.
 	const clientId = state.clientId;
@@ -184,6 +184,7 @@ function Assistant({ surface }: { surface: Surface }) {
 				connected={state.connection === "open"}
 				inControl={computerSession !== undefined}
 				yolo={yolo !== undefined}
+				halted={halted !== undefined}
 				toggle={togglePanel}
 				startDrag={() => void startDragging()}
 			/>
@@ -194,7 +195,7 @@ function Assistant({ surface }: { surface: Surface }) {
 			<div className="chat chat-web">
 				<div className="status" role="status">
 					{unreachable ??
-						"This page needs your access key. On your computer, open it from the Gentle Dot menu (Open in browser); on a server, open the link with #token=<your access key>."}
+						"Esta página necesita tu clave de acceso. En tu ordenador, ábrela desde el menú de VENIRON (Abrir en el navegador); en un servidor, abre el enlace con #token=<tu clave de acceso>."}
 				</div>
 			</div>
 		);

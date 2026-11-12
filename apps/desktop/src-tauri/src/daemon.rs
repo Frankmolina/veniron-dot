@@ -46,10 +46,11 @@ const PORT_RELEASE: Duration = Duration::from_secs(5);
 /// Why the app neither starts nor uses the assistant: one it did not launch holds the port.
 pub fn foreign_daemon_message(port: u16) -> String {
     format!(
-        "Another Gentle Dot assistant is already running on port {port}, and this app did not start it \
-(for example `pnpm dev`, or one left running by an older version of the app). Gentle Dot only uses an \
-assistant it started itself, so connectors stay safe. Stop the other one (press Ctrl+C where `pnpm dev` \
-runs, or quit the process listening on port {port}), then choose \"Restart assistant\" in the Gentle Dot menu."
+        "Hay otro asistente VENIRON en el puerto {port}, y esta app no lo ha arrancado \
+(por ejemplo `pnpm dev`, o uno que dejó una versión anterior). VENIRON solo usa un \
+asistente que ella misma ha puesto en marcha, para que los conectores sigan a salvo. Para el otro \
+(Ctrl+C donde corre `pnpm dev`, o cierra el proceso que escucha en el puerto {port}) y elige \
+\"Reiniciar el asistente\" en el menú de VENIRON."
     )
 }
 

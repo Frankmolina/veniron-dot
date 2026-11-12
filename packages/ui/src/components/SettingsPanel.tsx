@@ -19,7 +19,7 @@ type Status =
 	| { kind: "applied" }
 	| { kind: "failed"; reason: string };
 
-function reasonOf(error: unknown, fallback = "Gentle Dot could not change the shortcut."): string {
+function reasonOf(error: unknown, fallback = "VENIRON no ha podido cambiar el atajo."): string {
 	if (typeof error === "string" && error) return error;
 	if (error instanceof Error && error.message) return error.message;
 	return fallback;
@@ -92,7 +92,7 @@ export function SettingsPanel({ close }: { close: () => void }) {
 			},
 			(error: unknown) => {
 				if (!live.current) return;
-				setMemoryReason(reasonOf(error, "Gentle Dot could not change the memory setting."));
+				setMemoryReason(reasonOf(error, "VENIRON no ha podido cambiar el ajuste de memoria."));
 				setMemoryApplying(false);
 			},
 		);
@@ -116,33 +116,33 @@ export function SettingsPanel({ close }: { close: () => void }) {
 
 	const applying = status.kind === "applying";
 	return (
-		<section className="accounts settings" aria-label="Settings">
+		<section className="accounts settings" aria-label="Ajustes">
 			<header className="accounts-header">
-				<h2>Settings</h2>
-				<button type="button" className="icon" aria-label="Close settings" onClick={close}>
+				<h2>Ajustes</h2>
+				<button type="button" className="icon" aria-label="Cerrar ajustes" onClick={close}>
 					×
 				</button>
 			</header>
 
 			<section className="provider-section" aria-labelledby="settings-shortcut">
-				<h3 id="settings-shortcut">Keyboard shortcut</h3>
-				<p className="muted">Opens and hides the panel from any app.</p>
+				<h3 id="settings-shortcut">Atajo de teclado</h3>
+				<p className="muted">Abre y oculta el panel desde cualquier aplicación.</p>
 				{loadFailed ? (
 					<p className="settings-error" role="alert">
-						Gentle Dot could not read the current shortcut.
+						VENIRON no ha podido leer el atajo actual.
 					</p>
 				) : null}
 				<div className="shortcut-row">
 					{recording ? (
 						<span ref={prompt} className="shortcut-recording" tabIndex={-1}>
-							Press the new shortcut… Esc cancels.
+							Pulsa el nuevo atajo… Esc cancela.
 						</span>
 					) : (
 						<kbd className="shortcut-keys">{info ? show(info.shortcut) : "…"}</kbd>
 					)}
 					{recording ? (
 						<button type="button" onClick={() => setStatus({ kind: "idle" })}>
-							Cancel
+							Cancelar
 						</button>
 					) : (
 						<button
@@ -151,18 +151,18 @@ export function SettingsPanel({ close }: { close: () => void }) {
 							disabled={!info || applying}
 							onClick={() => setStatus({ kind: "recording" })}
 						>
-							Change
+							Cambiar
 						</button>
 					)}
 				</div>
 				{status.kind === "applying" ? (
 					<p className="muted" role="status">
-						Applying {show(status.shortcut)}…
+						Aplicando {show(status.shortcut)}…
 					</p>
 				) : null}
 				{status.kind === "applied" ? (
 					<p className="settings-ok" role="status">
-						Saved. It works right away.
+						Guardado. Ya funciona.
 					</p>
 				) : null}
 				{status.kind === "failed" ? (
@@ -171,42 +171,43 @@ export function SettingsPanel({ close }: { close: () => void }) {
 					</p>
 				) : null}
 				<p className="settings-hint muted">
-					Use at least one modifier key ({mac ? "⌘ ⌥ ⌃ ⇧" : "Super, Alt, Ctrl, Shift"}), or a function key.
+					Usa al menos una tecla modificadora ({mac ? "⌘ ⌥ ⌃ ⇧" : "Super, Alt, Ctrl, Shift"}) o una tecla de
+					función.
 				</p>
 				<button
 					type="button"
 					className="link"
-					title={info ? `Default: ${show(info.default)}` : undefined}
+					title={info ? `Predeterminado: ${show(info.default)}` : undefined}
 					disabled={!info || info.shortcut === info.default || applying || recording}
 					onClick={() => info && apply(info.default)}
 				>
-					Reset to default
+					Restablecer el predeterminado
 				</button>
 			</section>
 
 			<section className="provider-section" aria-labelledby="settings-memory">
-				<h3 id="settings-memory">Memory</h3>
+				<h3 id="settings-memory">Memoria</h3>
 				<p className="muted">
-					Turn this on to give the assistant a memory of its own instead of yours: it starts empty and never
-					reads or writes your Engram.
+					Actívalo para darle al asistente una memoria propia en lugar de la tuya: empieza vacía y nunca lee
+					ni escribe tu memoria.
 				</p>
 				{memoryFailed ? (
 					<p className="settings-error" role="alert">
-						Gentle Dot could not read the memory setting.
+						VENIRON no ha podido leer el ajuste de memoria.
 					</p>
 				) : null}
 				{memoryInvalid ? (
 					<>
 						<p className="settings-error" role="alert">
-							{memoryInvalid}. The assistant is not running until this is fixed: set memory to "shared" or
-							"private" in config.json, or choose one here.
+							{memoryInvalid}. El asistente no está en marcha hasta que esto se corrija: pon la memoria en
+							"shared" o "private" en config.json, o elige una aquí.
 						</p>
 						<div className="shortcut-row">
 							<button type="button" disabled={memoryApplying} onClick={() => applyMemory("shared")}>
-								Use shared memory
+								Usar memoria compartida
 							</button>
 							<button type="button" disabled={memoryApplying} onClick={() => applyMemory("private")}>
-								Use private memory
+								Usar memoria privada
 							</button>
 						</div>
 					</>
@@ -220,7 +221,7 @@ export function SettingsPanel({ close }: { close: () => void }) {
 							disabled={memory === undefined || memoryApplying}
 							onChange={(event) => applyMemory(event.target.checked ? "private" : "shared")}
 						/>
-						<span>Private memory</span>
+						<span>Memoria privada</span>
 					</label>
 				)}
 				{memoryReason ? (
@@ -231,12 +232,13 @@ export function SettingsPanel({ close }: { close: () => void }) {
 			</section>
 
 			<section className="provider-section" aria-labelledby="settings-voice-language" hidden={isWindows()}>
-				<h3 id="settings-voice-language">Voice language</h3>
+				<h3 id="settings-voice-language">Idioma de la voz</h3>
 				<p className="muted">
-					The language macOS speech listens in. The local voice model detects it by itself.
+					El idioma en el que escucha el reconocimiento de voz de macOS. El modelo de voz local lo detecta por
+					sí solo.
 				</p>
 				<select
-					aria-label="Voice language"
+					aria-label="Idioma de la voz"
 					value={language}
 					onChange={(event) => {
 						setLanguage(event.target.value);

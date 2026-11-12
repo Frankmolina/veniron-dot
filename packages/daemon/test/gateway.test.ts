@@ -559,11 +559,11 @@ describe("own instance", () => {
 	it("shows the access key only on an interactive terminal", () => {
 		const url = "http://127.0.0.1:4317/#token=secret-token";
 		const dataDir = join(tempDir(), "data");
-		expect(startupMessage(url, dataDir, true)).toBe(`Gentle Dot is running at ${url}`);
+		expect(startupMessage(url, dataDir, true)).toBe(`VENIRON está en marcha en ${url}`);
 		const piped = startupMessage(url, dataDir, false);
 		expect(piped).not.toContain("secret-token");
 		expect(piped).toBe(
-			`Gentle Dot is running at http://127.0.0.1:4317/ (the access key is in ${join(dataDir, "token")})`,
+			`VENIRON está en marcha en http://127.0.0.1:4317/ (la clave de acceso está en ${join(dataDir, "token")})`,
 		);
 	});
 });
@@ -576,7 +576,7 @@ describe("white label", () => {
 		const at = argv.indexOf("--append-system-prompt");
 		expect(at).toBeGreaterThan(-1);
 		const identity = readFileSync(argv[at + 1] ?? "", "utf8");
-		expect(identity).toContain("You are Gentle Dot");
+		expect(identity).toContain("You are VENIRON");
 		expect(d.supervisor.state).toBe("ready");
 	});
 
@@ -594,7 +594,7 @@ describe("white label", () => {
 		const client = await authed(d);
 		send(client, { type: "send", text: "ask:confirm" });
 		const ask = await find(client, "ask");
-		expect(ask.ask.message).toBe("Gentle Dot wants to continue");
+		expect(ask.ask.message).toBe("VENIRON wants to continue");
 	});
 
 	it("refuses internal slash commands", async () => {

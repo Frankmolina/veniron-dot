@@ -136,7 +136,7 @@ describe("the app's secret store over its channel", () => {
 		await expect(source.get("connector/x")).rejects.toThrow(NO_APP);
 		await expect(source.put("connector/x", "s")).rejects.toThrow(NO_APP);
 		await expect(new AppSecretSource(undefined).list()).rejects.toThrow(NO_APP);
-		expect(NO_APP).toBe("Open the Gentle Dot app to use this connector.");
+		expect(NO_APP).toBe("Abre la app VENIRON para usar este conector.");
 	});
 
 	it("passes on why the app's secret store is unavailable, so the assistant can say it (S25.7)", async () => {

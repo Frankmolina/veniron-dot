@@ -61,18 +61,18 @@ interface ChatSurfaceProps {
 	settings?: boolean;
 }
 
-const CONTINUE_TEXT = "Continue where you left off.";
+const CONTINUE_TEXT = "Continúa por donde lo dejaste.";
 
 type SwitchMessage = Extract<ClientMessage, { type: "new_conversation" | "open_conversation" }>;
 
 function statusText(state: DotState): string | undefined {
 	if (state.connection === "unauthorized") {
-		return "This access key is not valid anymore. Open the page again from the Gentle Dot menu (Open in browser).";
+		return "Esta clave de acceso ya no es válida. Vuelve a abrir la página desde el menú de VENIRON (Abrir en el navegador).";
 	}
-	if (state.connection === "closed") return "Reconnecting to the assistant…";
-	if (state.connection === "connecting") return "Connecting…";
-	if (state.agentState === "restarting") return "The assistant is restarting…";
-	if (state.agentState === "starting") return "Starting the assistant…";
+	if (state.connection === "closed") return "Reconectando con el asistente…";
+	if (state.connection === "connecting") return "Conectando…";
+	if (state.agentState === "restarting") return "El asistente se está reiniciando…";
+	if (state.agentState === "starting") return "Iniciando el asistente…";
 	return undefined;
 }
 
@@ -183,8 +183,8 @@ export function ChatSurface({
 						<button
 							type="button"
 							className="icon"
-							aria-label="Conversations"
-							title="Conversations"
+							aria-label="Conversaciones"
+							title="Conversaciones"
 							aria-expanded={showConversations}
 							onClick={() => {
 								if (!showConversations) send({ type: "list_conversations" });
@@ -197,20 +197,20 @@ export function ChatSurface({
 				) : (
 					<h1 className="assistant-name">
 						<RoseGlyph />
-						<span className="gradient-text">Gentle Dot</span>
+						<span className="gradient-text">VENIRON</span>
 					</h1>
 				)}
-				<button type="button" className="icon" aria-label="Accounts" title="Accounts" onClick={openAccounts}>
+				<button type="button" className="icon" aria-label="Cuentas" title="Cuentas" onClick={openAccounts}>
 					<AccountsIcon />
 				</button>
-				<button type="button" className="icon" aria-label="Profiles" title="Profiles" onClick={openProfiles}>
+				<button type="button" className="icon" aria-label="Perfiles" title="Perfiles" onClick={openProfiles}>
 					<ProfilesIcon />
 				</button>
 				<button
 					type="button"
 					className="icon"
-					aria-label="Connectors"
-					title="Connectors"
+					aria-label="Conectores"
+					title="Conectores"
 					onClick={openConnectors}
 				>
 					<ConnectorsIcon />
@@ -220,8 +220,8 @@ export function ChatSurface({
 					<button
 						type="button"
 						className="icon"
-						aria-label="New conversation"
-						title="New conversation"
+						aria-label="Nueva conversación"
+						title="Nueva conversación"
 						disabled={!ready}
 						onClick={() => switchTo({ type: "new_conversation" })}
 					>
@@ -232,8 +232,8 @@ export function ChatSurface({
 					<button
 						type="button"
 						className="icon"
-						aria-label="Settings"
-						title="Settings"
+						aria-label="Ajustes"
+						title="Ajustes"
 						aria-expanded={settingsShown}
 						onClick={() => (settingsShown ? setShowSettings(false) : openSettings())}
 					>
@@ -247,7 +247,7 @@ export function ChatSurface({
 					</>
 				) : null}
 				{onHide ? (
-					<button type="button" className="icon" aria-label="Hide" title="Hide" onClick={onHide}>
+					<button type="button" className="icon" aria-label="Ocultar" title="Ocultar" onClick={onHide}>
 						<MinusIcon />
 					</button>
 				) : null}
@@ -258,9 +258,9 @@ export function ChatSurface({
 			) : null}
 
 			{conversations && showConversations ? (
-				<nav className="conversations" aria-label="Earlier conversations">
-					<p className="eyebrow">Conversations</p>
-					{state.conversations.length === 0 ? <p className="muted">No conversations yet.</p> : null}
+				<nav className="conversations" aria-label="Conversaciones anteriores">
+					<p className="eyebrow">Conversaciones</p>
+					{state.conversations.length === 0 ? <p className="muted">Aún no hay conversaciones.</p> : null}
 					{state.conversations.map((conversation) => (
 						<button
 							key={conversation.id}
@@ -327,9 +327,9 @@ export function ChatSurface({
 				{/* In the chat's own flow, so messages start below it instead of sliding under it. */}
 				{needsAccount(state) ? (
 					<div className="onboarding">
-						<p>To start, connect the AI service you use (a subscription or an API key).</p>
+						<p>Para empezar, conecta el servicio de IA que usas (una suscripción o una clave de API).</p>
 						<button type="button" className="primary" onClick={openAccounts}>
-							Connect an AI account
+							Conectar una cuenta de IA
 						</button>
 					</div>
 				) : null}
@@ -345,14 +345,14 @@ export function ChatSurface({
 				/>
 				{state.interrupted ? (
 					<div className="interrupted">
-						<p>I was interrupted. Continue?</p>
+						<p>Me han interrumpido. ¿Continúo?</p>
 						<button
 							type="button"
 							className="primary"
 							disabled={!ready}
 							onClick={() => send({ type: "send", text: CONTINUE_TEXT, requestId: newRequestId() })}
 						>
-							Continue
+							Continuar
 						</button>
 					</div>
 				) : null}
@@ -375,12 +375,12 @@ export function ChatSurface({
 				<div
 					className="switch-confirm pin-dialog"
 					role="dialog"
-					aria-label={pin.set ? "Enter your PIN" : "Create a PIN"}
+					aria-label={pin.set ? "Introduce tu PIN" : "Crea un PIN"}
 				>
 					<p>{describePinCommand(pinPending, state.connectors.list)}</p>
 					<PinForm
 						pin={pin}
-						action="Continue"
+						action="Continuar"
 						onPin={(value, created) => {
 							if (created) send({ type: "pin_set", pin: value });
 							send({ type: "pin_command", pin: value, command: pinPending });
@@ -394,19 +394,19 @@ export function ChatSurface({
 								// Nothing was sent: a sign-in that was starting stops, as when the app declines.
 								dispatch({
 									type: "server",
-									message: { type: "error", code: "declined", message: "Nothing was changed.", seq: 0 },
+									message: { type: "error", code: "declined", message: "No se ha cambiado nada.", seq: 0 },
 								});
 							}}
 						>
-							Cancel
+							Cancelar
 						</button>
 					</PinForm>
 				</div>
 			) : null}
 
 			{pendingSwitch ? (
-				<div className="switch-confirm" role="alertdialog" aria-label="Stop and switch?">
-					<p>The assistant is still answering. Stop it and open the other conversation?</p>
+				<div className="switch-confirm" role="alertdialog" aria-label="¿Detener y cambiar?">
+					<p>El asistente sigue respondiendo. ¿Lo detienes y abres la otra conversación?</p>
 					<div className="switch-actions">
 						<button
 							type="button"
@@ -416,10 +416,10 @@ export function ChatSurface({
 								setPendingSwitch(undefined);
 							}}
 						>
-							Stop and switch
+							Detener y cambiar
 						</button>
 						<button type="button" onClick={() => setPendingSwitch(undefined)}>
-							Cancel
+							Cancelar
 						</button>
 					</div>
 				</div>
@@ -430,7 +430,7 @@ export function ChatSurface({
 					{state.notices.map((notice) => (
 						<div key={notice.id} className={`notice notice-${notice.level}`}>
 							<span>{notice.message}</span>
-							<button type="button" aria-label="Dismiss" onClick={() => dismiss(notice.id)}>
+							<button type="button" aria-label="Descartar" onClick={() => dismiss(notice.id)}>
 								×
 							</button>
 						</div>
@@ -460,7 +460,7 @@ export function ChatSurface({
 
 /** Spoken replies on or off (S30.3); the choice is remembered. */
 function MuteButton({ voice }: { voice: VoiceControls }) {
-	const label = voice.muted ? "Unmute spoken replies" : "Mute spoken replies";
+	const label = voice.muted ? "Activar las respuestas habladas" : "Silenciar las respuestas habladas";
 	return (
 		<button
 			type="button"
@@ -476,7 +476,7 @@ function MuteButton({ voice }: { voice: VoiceControls }) {
 }
 
 function RoseButton({ controls }: { controls: PanelWindowControls }) {
-	const label = controls.roseHidden ? "Show the rose" : "Hide the rose";
+	const label = controls.roseHidden ? "Mostrar la máscara" : "Ocultar la máscara";
 	return (
 		<button
 			type="button"
@@ -491,7 +491,7 @@ function RoseButton({ controls }: { controls: PanelWindowControls }) {
 }
 
 function FullscreenButton({ controls }: { controls: PanelWindowControls }) {
-	const label = controls.fullscreen ? "Exit full screen" : "Full screen";
+	const label = controls.fullscreen ? "Salir de pantalla completa" : "Pantalla completa";
 	return (
 		<button
 			type="button"

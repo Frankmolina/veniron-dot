@@ -11,7 +11,7 @@
 import { APPROVAL_WAIT_MS, type AppChannel } from "./app-channel.ts";
 
 /** Why a connector that needs a secret cannot run: the secrets are only in the app's store. */
-export const NO_APP = "Open the Gentle Dot app to use this connector.";
+export const NO_APP = "Abre la app VENIRON para usar este conector.";
 
 /**
  * The app's answer when Linux has no usable Secret Service (`StoreError::Unavailable` in `secure_store/linux.rs`).

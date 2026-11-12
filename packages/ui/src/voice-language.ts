@@ -6,12 +6,12 @@
 const KEY = "gentle-dot-voice-language";
 
 export const VOICE_LANGUAGES: readonly (readonly [locale: string, label: string])[] = [
-	["", "Automatic (system language)"],
+	["", "Automático (idioma del sistema)"],
 	["es-ES", "Español"],
-	["en-US", "English"],
-	["pt-BR", "Português"],
-	["fr-FR", "Français"],
-	["de-DE", "Deutsch"],
+	["en-US", "Inglés"],
+	["pt-BR", "Portugués"],
+	["fr-FR", "Francés"],
+	["de-DE", "Alemán"],
 	["it-IT", "Italiano"],
 ];
 

@@ -29,23 +29,23 @@ type Mode =
 	| { kind: "delete"; name: string };
 
 const THINKING_LABELS: Record<ThinkingLevel, string> = {
-	off: "Off",
-	minimal: "Minimal",
-	low: "Low",
-	medium: "Medium",
-	high: "High",
-	xhigh: "Extra high",
-	max: "Max",
+	off: "Desactivado",
+	minimal: "Mínimo",
+	low: "Bajo",
+	medium: "Medio",
+	high: "Alto",
+	xhigh: "Muy alto",
+	max: "Máximo",
 };
 
 const NAME_HINT =
-	"Use letters, numbers, dots, dashes, or underscores (up to 64), starting with a letter or number.";
+	"Usa letras, números, puntos, guiones o guiones bajos (hasta 64) y que empiece por una letra o un número.";
 
 /** Names a profile, or explains why the name cannot be used. */
 function nameProblem(name: string, taken: string[]): string | undefined {
 	if (!name) return undefined;
 	if (!isValidProfileName(name)) return NAME_HINT;
-	if (taken.includes(name)) return "A profile with that name already exists.";
+	if (taken.includes(name)) return "Ya existe un perfil con ese nombre.";
 	return undefined;
 }
 
@@ -57,13 +57,13 @@ export function ProfilesPanel({ profiles, providers = [], send, dispatch }: Prof
 	const back = () => setMode({ kind: "list" });
 
 	return (
-		<section className="profiles" aria-label="Profiles">
+		<section className="profiles" aria-label="Perfiles">
 			<header className="profiles-header">
-				<h2>Profiles</h2>
+				<h2>Perfiles</h2>
 				<button
 					type="button"
 					className="icon"
-					aria-label="Close profiles"
+					aria-label="Cerrar perfiles"
 					onClick={() => dispatch({ type: "profiles", open: false })}
 				>
 					×
@@ -99,7 +99,7 @@ export function ProfilesPanel({ profiles, providers = [], send, dispatch }: Prof
 			) : (
 				<>
 					<p className="muted">
-						A profile chooses the AI model each part of the assistant uses. Switch profiles any time.
+						Un perfil elige el modelo de IA que usa cada parte del asistente. Cambia de perfil cuando quieras.
 					</p>
 					{profiles.lastImport ? (
 						<ImportResult
@@ -110,8 +110,8 @@ export function ProfilesPanel({ profiles, providers = [], send, dispatch }: Prof
 							}}
 						/>
 					) : null}
-					{profiles.list === undefined ? <p className="muted">Loading…</p> : null}
-					{profiles.list?.length === 0 ? <p className="muted">No profiles yet.</p> : null}
+					{profiles.list === undefined ? <p className="muted">Cargando…</p> : null}
+					{profiles.list?.length === 0 ? <p className="muted">Aún no hay perfiles.</p> : null}
 					<ul className="profile-list">
 						{list.map((profile) => {
 							const inUse = profile.name === profiles.active;
@@ -120,12 +120,12 @@ export function ProfilesPanel({ profiles, providers = [], send, dispatch }: Prof
 								<li key={profile.name} className={inUse ? "in-use" : undefined}>
 									<div className="profile-name">
 										<b>{profile.name}</b>
-										{inUse ? <span className="chip ok">In use</span> : null}
+										{inUse ? <span className="chip ok">En uso</span> : null}
 									</div>
 									<p className="profile-summary">{summary(profile, profiles.roles, profiles.models)}</p>
 									{deleting ? (
-										<div className="profile-confirm" role="alertdialog" aria-label="Delete profile">
-											<p>{`Delete “${profile.name}”? This cannot be undone.`}</p>
+										<div className="profile-confirm" role="alertdialog" aria-label="Eliminar perfil">
+											<p>{`¿Eliminar «${profile.name}»? Esto no se puede deshacer.`}</p>
 											<button
 												type="button"
 												className="primary danger"
@@ -134,10 +134,10 @@ export function ProfilesPanel({ profiles, providers = [], send, dispatch }: Prof
 													back();
 												}}
 											>
-												Delete
+												Eliminar
 											</button>
 											<button type="button" onClick={back}>
-												Keep it
+												Conservarlo
 											</button>
 										</div>
 									) : (
@@ -148,32 +148,32 @@ export function ProfilesPanel({ profiles, providers = [], send, dispatch }: Prof
 													className="primary"
 													onClick={() => send({ type: "profile_apply", name: profile.name })}
 												>
-													Use
+													Usar
 												</button>
 											)}
 											<button type="button" onClick={() => setMode({ kind: "edit", profile })}>
-												Edit
+												Editar
 											</button>
 											<button
 												type="button"
 												onClick={() => setMode({ kind: "name", action: "duplicate", from: profile.name })}
 											>
-												Duplicate
+												Duplicar
 											</button>
 											<button
 												type="button"
 												onClick={() => setMode({ kind: "name", action: "rename", from: profile.name })}
 											>
-												Rename
+												Renombrar
 											</button>
 											<button
 												type="button"
 												className="link"
 												disabled={inUse}
-												title={inUse ? "Switch to another profile before deleting this one." : undefined}
+												title={inUse ? "Cambia a otro perfil antes de eliminar este." : undefined}
 												onClick={() => setMode({ kind: "delete", name: profile.name })}
 											>
-												Delete
+												Eliminar
 											</button>
 										</div>
 									)}
@@ -183,14 +183,14 @@ export function ProfilesPanel({ profiles, providers = [], send, dispatch }: Prof
 					</ul>
 					<div className="profiles-footer">
 						<button type="button" className="primary" onClick={() => setMode({ kind: "edit" })}>
-							New profile
+							Nuevo perfil
 						</button>
 						<button type="button" onClick={() => setMode({ kind: "name", action: "save_current" })}>
-							Save my current setup
+							Guardar mi configuración actual
 						</button>
 						{profiles.importable ? (
 							<button type="button" onClick={() => send({ type: "profile_import" })}>
-								Import my Gentle Shell profiles
+								Importar mis perfiles de Gentle Shell
 							</button>
 						) : null}
 					</div>
@@ -201,7 +201,7 @@ export function ProfilesPanel({ profiles, providers = [], send, dispatch }: Prof
 }
 
 function modelLabel(model: string | undefined, models: ModelOption[]): string {
-	if (!model) return "Default";
+	if (!model) return "Predeterminado";
 	return models.find((m) => `${m.provider}/${m.id}` === model)?.name ?? model;
 }
 
@@ -213,7 +213,7 @@ function summary(profile: Profile, roles: ProfileRole[], models: ModelOption[]):
 		const thinking = route.thinking ? ` · ${THINKING_LABELS[route.thinking]}` : "";
 		return [`${role.label}: ${modelLabel(route.model, models)}${thinking}`];
 	});
-	return lines.length > 0 ? lines.join(", ") : "Uses the default model everywhere.";
+	return lines.length > 0 ? lines.join(", ") : "Usa el modelo predeterminado en todas partes.";
 }
 
 function ProfileEditor({
@@ -259,19 +259,19 @@ function ProfileEditor({
 	return (
 		<form
 			className="profile-editor"
-			aria-label={profile ? `Edit ${profile.name}` : "New profile"}
+			aria-label={profile ? `Editar ${profile.name}` : "Nuevo perfil"}
 			onSubmit={submit}
 		>
 			{profile ? (
 				<h3>{profile.name}</h3>
 			) : (
 				<label className="profile-field">
-					<span>Name</span>
+					<span>Nombre</span>
 					<input
 						type="text"
-						aria-label="Profile name"
+						aria-label="Nombre del perfil"
 						autoComplete="off"
-						placeholder="for example deep-work"
+						placeholder="por ejemplo trabajo-profundo"
 						value={name}
 						onChange={(event) => setName(event.target.value)}
 					/>
@@ -286,11 +286,11 @@ function ProfileEditor({
 						<div className="role-route" key={role.id}>
 							<span className="role-label">{role.label}</span>
 							<select
-								aria-label={`${role.label} model`}
+								aria-label={`${role.label} modelo`}
 								value={route.model ?? ""}
 								onChange={(event) => update(role.id, { model: event.target.value })}
 							>
-								<option value="">Default</option>
+								<option value="">Predeterminado</option>
 								{[...groups].map(([provider, options]) => (
 									<optgroup key={provider} label={providerName(provider)}>
 										{options.map((m) => (
@@ -300,10 +300,10 @@ function ProfileEditor({
 										))}
 									</optgroup>
 								))}
-								{known ? null : <option value={route.model}>{`${route.model} (not available)`}</option>}
+								{known ? null : <option value={route.model}>{`${route.model} (no disponible)`}</option>}
 							</select>
 							<select
-								aria-label={`${role.label} thinking`}
+								aria-label={`${role.label} razonamiento`}
 								value={route.thinking ?? ""}
 								onChange={(event) =>
 									update(role.id, {
@@ -311,7 +311,7 @@ function ProfileEditor({
 									})
 								}
 							>
-								<option value="">Default</option>
+								<option value="">Predeterminado</option>
 								{THINKING_LEVELS.map((level) => (
 									<option key={level} value={level}>
 										{THINKING_LABELS[level]}
@@ -324,10 +324,10 @@ function ProfileEditor({
 			</div>
 			<div className="profile-form-actions">
 				<button type="submit" className="primary" disabled={!valid}>
-					Save
+					Guardar
 				</button>
 				<button type="button" onClick={onCancel}>
-					Cancel
+					Cancelar
 				</button>
 			</div>
 		</form>
@@ -335,9 +335,9 @@ function ProfileEditor({
 }
 
 const NAME_FORMS = {
-	rename: { label: "New name", submit: "Rename" },
-	duplicate: { label: "Name for the copy", submit: "Duplicate" },
-	save_current: { label: "Name for your current setup", submit: "Save" },
+	rename: { label: "Nuevo nombre", submit: "Renombrar" },
+	duplicate: { label: "Nombre de la copia", submit: "Duplicar" },
+	save_current: { label: "Nombre para tu configuración actual", submit: "Guardar" },
 } as const;
 
 function NameForm({
@@ -351,7 +351,7 @@ function NameForm({
 	onSubmit: (name: string) => void;
 	onCancel: () => void;
 }) {
-	const initial = mode.action === "duplicate" ? `${mode.from}-copy` : (mode.from ?? "");
+	const initial = mode.action === "duplicate" ? `${mode.from}-copia` : (mode.from ?? "");
 	const [name, setName] = useState(initial);
 	const text = NAME_FORMS[mode.action];
 	const problem = name === mode.from ? undefined : nameProblem(name, taken);
@@ -381,7 +381,7 @@ function NameForm({
 					{text.submit}
 				</button>
 				<button type="button" onClick={onCancel}>
-					Cancel
+					Cancelar
 				</button>
 			</div>
 		</form>
@@ -399,15 +399,19 @@ function ImportResult({
 	const count = result.imported.length;
 	return (
 		<div className="profiles-import" role="status">
-			<p>{count === 0 ? "Nothing new to import." : `Imported ${count} profile${count === 1 ? "" : "s"}.`}</p>
+			<p>
+				{count === 0
+					? "Nada nuevo que importar."
+					: `Se ha${count === 1 ? "" : "n"} importado ${count} perfil${count === 1 ? "" : "es"}.`}
+			</p>
 			{renamed.length > 0 ? (
-				<p>{`Renamed because the name was taken: ${renamed.map((r) => `${r.from} → ${r.to}`).join(", ")}.`}</p>
+				<p>{`Se ha cambiado el nombre porque ya existía: ${renamed.map((r) => `${r.from} → ${r.to}`).join(", ")}.`}</p>
 			) : null}
 			{result.missingProviders.length > 0 ? (
 				<p>
-					{`Connect these accounts to use them: ${result.missingProviders.join(", ")}. `}
+					{`Conecta estas cuentas para usarlas: ${result.missingProviders.join(", ")}. `}
 					<button type="button" className="link" onClick={openAccounts}>
-						Open accounts
+						Abrir cuentas
 					</button>
 				</p>
 			) : null}
