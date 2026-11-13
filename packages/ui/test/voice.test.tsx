@@ -400,6 +400,26 @@ describe("spoken replies", () => {
 		expect(synth.current?.lang).toBe("en");
 	});
 
+	it("reads an Alt+V dictation reply with the system voice even when daemon TTS is available", async () => {
+		h.tauri = true;
+		h.invoke = vi.fn(async (command: string) => {
+			if (command === "voice_status") return { available: true };
+			if (command === "voice_stop") return { text: "hola mundo" };
+			return undefined;
+		});
+		render(<Harness initial={withVoice(true, true)} />);
+		await waitFor(() => expect(h.listeners.has("voice://dictate")).toBe(true));
+		act(() => h.listeners.get("voice://dictate")?.({ payload: {} }));
+		await screen.findByRole("timer");
+		await userEvent.click(await screen.findByRole("button", { name: "Detener y enviar" }));
+		await waitFor(() => expect(screen.getByRole("textbox", { name: "Mensaje" })).toHaveValue("hola mundo"));
+		fireEvent.keyDown(screen.getByRole("textbox", { name: "Mensaje" }), { key: "Enter" });
+		await waitFor(() => expect(sentOf("send")).toHaveLength(1));
+		reply("a1", "Respuesta hablada.");
+		await waitFor(() => expect(synth.speak).toHaveBeenCalledTimes(1));
+		expect(sentOf("voice_speak")).toEqual([]);
+	});
+
 	it("picks a voice in the reply's language", async () => {
 		render(<Harness initial={withVoice(true, false)} />);
 		await voiceTurn("hola");
