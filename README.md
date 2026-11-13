@@ -115,6 +115,10 @@ pnpm install
 
 # macOS (Apple Silicon): writes a DMG
 pnpm package:mac
+# With a local "VENIRON Dev" certificate, package:mac signs the app and its
+# runtime with it automatically, so TCC/Keychain grants survive rebuilds.
+# `--sign <identity>` or GENTLE_DOT_SIGN_IDENTITY overrides it; without the
+# certificate (CI, fresh Mac) it falls back to ad hoc signing.
 
 # Linux: a .deb (amd64 also builds the Arch package)
 pnpm package:linux --arch arm64
