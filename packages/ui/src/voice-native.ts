@@ -37,6 +37,12 @@ export function cancelNativeVoice(): Promise<void> {
 	return invoke<void>("voice_cancel");
 }
 
+/** Alt+V: the native panel shortcut asks the open panel to start or stop a dictation. */
+export async function onVoiceShortcut(handler: () => void): Promise<() => void> {
+	const { listen } = await tauriEvents();
+	return listen("voice://dictate", () => handler());
+}
+
 /** One shared load of the event module (under Vitest mocks, a second concurrent import got the real one). */
 let events: Promise<typeof import("@tauri-apps/api/event")> | undefined;
 const tauriEvents = () => {

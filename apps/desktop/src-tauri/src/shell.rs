@@ -939,11 +939,14 @@ fn register_panic_shortcut(app: &AppHandle) {
     }
 }
 
-/// What the panel shortcut does, at launch and after a change in Settings.
+/// What the panel shortcut does: show/focus the panel and ask it to start or stop
+/// an Alt+V dictation. The panel itself decides whether to record, stop or do nothing.
 fn toggle_on_press(app: &AppHandle, _: &Shortcut, event: ShortcutEvent) {
     if event.state() == ShortcutState::Pressed {
-        if let Err(error) = toggle_panel(app.clone()) {
-            eprintln!("gentle-dot: cannot toggle the panel: {error}");
+        if let Err(error) = show_panel(app) {
+            eprintln!("gentle-dot: cannot show the panel for dictation: {error}");
+        } else if let Err(error) = app.emit("voice://dictate", ()) {
+            eprintln!("gentle-dot: cannot start dictation: {error}");
         }
     }
 }
