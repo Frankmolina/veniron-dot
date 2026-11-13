@@ -52,7 +52,7 @@ Assistants live in a browser tab you have to go find, forget you between chats, 
 
 ### Always one key away
 
-A glowing rose sits on your desktop. Click it, press your shortcut (**`⌥ Space`** on macOS and Linux, **`Ctrl+Alt+Space`** on Windows, unless you pick another), or use the menu bar, and the chat opens over whatever you are doing. Hide the rose if you prefer, or open the chat full screen with **`⌘⇧F`**. The same chat runs in the browser, on your machine or on your own server.
+A glowing rose sits on your desktop. Click it, press your shortcut (**`⌥V`** on macOS, **`Alt+Space`** on Linux, **`Ctrl+Alt+Space`** on Windows, unless you pick another), or use the menu bar, and the chat opens over whatever you are doing. On macOS the same shortcut starts a native Spanish dictation; press it again to stop, and the transcript waits in the input without being sent. Hide the rose if you prefer, or open the chat full screen with **`⌘⇧F`**. The same chat runs in the browser, on your machine or on your own server.
 
 ---
 

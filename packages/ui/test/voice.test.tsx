@@ -320,6 +320,20 @@ describe("talking on the desktop", () => {
 		expect(invoked("voice_status")).toHaveLength(3);
 	});
 
+	it("Alt+V dictates in Spanish into the composer without sending", async () => {
+		desktop({ available: true });
+		render(<Harness initial={withVoice(false)} />);
+		await waitFor(() => expect(h.listeners.has("voice://dictate")).toBe(true));
+		emit("voice://dictate", {});
+		await screen.findByRole("timer");
+		expect(invoked("voice_start")[0]?.[1]).toEqual({ locale: "es-ES" });
+		emit("voice://partial", { text: "hola" });
+		await userEvent.click(await screen.findByRole("button", { name: "Detener y enviar" }));
+		await waitFor(() => expect(screen.getByRole("textbox", { name: "Mensaje" })).toHaveValue("hola mundo"));
+		expect(invoked("voice_stop")).toHaveLength(1);
+		expect(sentOf("send")).toEqual([]);
+	});
+
 	it("listens in the language chosen in Settings instead of the system's", async () => {
 		localStorage.setItem("gentle-dot-voice-language", "es-ES");
 		desktop({ available: true });

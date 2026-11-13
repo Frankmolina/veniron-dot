@@ -11,6 +11,7 @@ import {
 	nativeVoiceStatus,
 	onNativeVoice,
 	onVoiceModel,
+	onVoiceShortcut,
 	startNativeVoice,
 	startRefusal,
 	stopNativeVoice,
@@ -123,6 +124,8 @@ export function useVoice(state: DotState, send: Send): VoiceControls {
 	const audio = useRef<HTMLAudioElement | undefined>(undefined);
 	/** A reply to a spoken message is awaited: the ids of the messages shown before it. */
 	const voiceTurn = useRef<Set<string> | undefined>(undefined);
+	/** Alt+V dictates into the composer and never sends, regardless of the mic preference. */
+	const forceDraft = useRef(false);
 	const latest = useRef(state);
 	latest.current = state;
 	const mutedNow = useRef(muted);
@@ -145,6 +148,7 @@ export function useVoice(state: DotState, send: Send): VoiceControls {
 			setLevel(0);
 			setPartial("");
 			setNote(reason);
+			forceDraft.current = false;
 		},
 		[setPhase],
 	);
@@ -199,12 +203,16 @@ export function useVoice(state: DotState, send: Send): VoiceControls {
 				finish(REASONS.empty);
 				return;
 			}
-			if (sendOnStopNow.current) {
+			const forcedDictation = forceDraft.current;
+			const reviewOnly = forcedDictation || !sendOnStopNow.current;
+			forceDraft.current = false;
+			if (reviewOnly) {
+				// An Alt+V dictation never marks a spoken turn: this phase has no spoken replies.
+				dictated.current = !forcedDictation;
+				setDraft((previous) => ({ id: (previous?.id ?? 0) + 1, text }));
+			} else {
 				voiceTurn.current = new Set(latest.current.messages.map((m) => m.id));
 				send({ type: "send", text, requestId: newRequestId() });
-			} else {
-				dictated.current = true;
-				setDraft((previous) => ({ id: (previous?.id ?? 0) + 1, text }));
 			}
 			finish();
 		},
@@ -297,16 +305,20 @@ export function useVoice(state: DotState, send: Send): VoiceControls {
 		entry.limit = setTimeout(stop, MAX_RECORDING_MS);
 	}, [begin, finish, stop, upload]);
 
-	const startNative = useCallback(async () => {
-		try {
-			// Apple's recognizer listens in one language: the one chosen in Settings, else the system's.
-			await startNativeVoice(voiceLanguage() ?? navigator.language);
-		} catch (error) {
-			finish(startRefusal(error));
-			return;
-		}
-		begin({ kind: "native", cancelled: false });
-	}, [begin, finish]);
+	const startNative = useCallback(
+		async (locale?: string) => {
+			try {
+				// Apple's recognizer listens in one language: the one chosen in Settings, else Spanish for
+				// the Alt+V dictation and the system's for the mic button.
+				await startNativeVoice(locale ?? voiceLanguage() ?? navigator.language);
+			} catch (error) {
+				finish(startRefusal(error));
+				return;
+			}
+			begin({ kind: "native", cancelled: false });
+		},
+		[begin, finish],
+	);
 
 	const start = useCallback(() => {
 		if (phaseNow.current !== "idle" || starting.current) return;
@@ -318,6 +330,30 @@ export function useVoice(state: DotState, send: Send): VoiceControls {
 			starting.current = false;
 		});
 	}, [source.kind, startDaemon, startNative, stopSpeaking]);
+
+	const startDictation = useCallback(() => {
+		if (phaseNow.current !== "idle" || starting.current) return;
+		stopSpeaking();
+		starting.current = true;
+		forceDraft.current = true;
+		void startNative(voiceLanguage() ?? "es-ES").finally(() => {
+			starting.current = false;
+		});
+	}, [startNative, stopSpeaking]);
+
+	useEffect(() => {
+		if (!desktop) return;
+		let live = true;
+		const off = onVoiceShortcut(() => {
+			if (!live) return;
+			if (phaseNow.current === "recording") stop();
+			else if (phaseNow.current === "idle") startDictation();
+		}).catch(() => () => {});
+		return () => {
+			live = false;
+			void off.then((stopListening) => stopListening());
+		};
+	}, [desktop, stop, startDictation]);
 
 	const cancel = useCallback(() => {
 		const current = recording.current;
