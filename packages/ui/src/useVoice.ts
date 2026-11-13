@@ -126,6 +126,8 @@ export function useVoice(state: DotState, send: Send): VoiceControls {
 	const voiceTurn = useRef<Set<string> | undefined>(undefined);
 	/** Alt+V dictates into the composer and never sends, regardless of the mic preference. */
 	const forceDraft = useRef(false);
+	/** Alt+V replies use the free system voice, never the paid OpenAI speech path. */
+	const nativeSpeech = useRef(false);
 	const latest = useRef(state);
 	latest.current = state;
 	const mutedNow = useRef(muted);
@@ -178,7 +180,7 @@ export function useVoice(state: DotState, send: Send): VoiceControls {
 		(reply: string) => {
 			const text = speakableText(reply).slice(0, MAX_VOICE_TEXT);
 			if (!text || mutedNow.current) return;
-			if (!latest.current.voice.speak) {
+			if (nativeSpeech.current || !latest.current.voice.speak) {
 				speakWithSystem(text);
 				return;
 			}
@@ -207,8 +209,8 @@ export function useVoice(state: DotState, send: Send): VoiceControls {
 			const reviewOnly = forcedDictation || !sendOnStopNow.current;
 			forceDraft.current = false;
 			if (reviewOnly) {
-				// An Alt+V dictation never marks a spoken turn: this phase has no spoken replies.
-				dictated.current = !forcedDictation;
+				// Alt+V reviews the text before sending; its reply is read aloud by the system voice.
+				dictated.current = true;
 				setDraft((previous) => ({ id: (previous?.id ?? 0) + 1, text }));
 			} else {
 				voiceTurn.current = new Set(latest.current.messages.map((m) => m.id));
@@ -323,6 +325,7 @@ export function useVoice(state: DotState, send: Send): VoiceControls {
 	const start = useCallback(() => {
 		if (phaseNow.current !== "idle" || starting.current) return;
 		stopSpeaking();
+		nativeSpeech.current = false;
 		if (source.kind === "none") return;
 		starting.current = true;
 		const run = source.kind === "daemon" ? startDaemon() : startNative();
@@ -336,6 +339,7 @@ export function useVoice(state: DotState, send: Send): VoiceControls {
 		stopSpeaking();
 		starting.current = true;
 		forceDraft.current = true;
+		nativeSpeech.current = true;
 		void startNative(voiceLanguage() ?? "es-ES").finally(() => {
 			starting.current = false;
 		});
